@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Starter Calculator</title>
+  <style>
+    body {
+      font-family: -apple-system, system-ui;
+      padding: 20px;
+      background: #f7f7f7;
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    input {
+      width: 100%;
+      font-size: 18px;
+      padding: 12px;
+      margin: 6px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 18px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      line-height: 1.5;
+    }
+
+    .label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Starter Calculator</h2>
+
+  <div class="label">Current Starter (g)</div>
+  <input id="current" type="number" value="50">
+
+  <div class="label">Per Batch (g)</div>
+  <input id="perBatch" type="number" value="100">
+
+  <div class="label">Number of Batches</div>
+  <input id="batches" type="number" value="1">
+
+  <div class="label">Leftover (g)</div>
+  <input id="leftover" type="number" value="50">
+
+  <div class="label">Total Override (optional)</div>
+  <input id="override" type="number" placeholder="Leave blank to auto-calc">
+
+  <div class="result" id="result"></div>
+
+  <script>
+    const inputs = document.querySelectorAll("input");
+    inputs.forEach(i => i.addEventListener("input", calc));
+
+    function format(n) {
+      return Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, '');
+    }
+
+    function calc() {
+      const current = +document.getElementById('current').value || 0;
+      const perBatch = +document.getElementById('perBatch').value || 0;
+      const batches = +document.getElementById('batches').value || 0;
+      const leftover = +document.getElementById('leftover').value || 0;
+      const override = +document.getElementById('override').value;
+
+      let target = override || (perBatch * batches + leftover);
+
+      if (!current || !target || target <= current) {
+        document.getElementById('result').innerText =
+          "Enter valid numbers (target must be > current)";
+        return;
+      }
+
+      const toAdd = target - current;
+      const flour = toAdd / 2;
+      const water = toAdd / 2;
+
+      const flourRatio = flour / current;
+      const waterRatio = water / current;
+
+      const breakdown = `${format(current)} + ${format(flour)} + ${format(water)} = ${format(target)}`;
+
+      document.getElementById('result').innerHTML = `
+      🧮 Target: <b>${format(target)} g</b><br><br>
+  
+      Add:<br>
+      🌾 Flour: <b>${format(flour)} g</b><br>
+      💧 Water: <b>${format(water)} g</b><br><br>
+  
+      ⚖️ Ratio: <b>1 : ${format(flourRatio)} : ${format(waterRatio)}</b><br>
+      (starter : flour : water)<br><br>
+  
+      🧾 Breakdown:<br>
+      ${breakdown}
+    `;
+    }
+
+    calc();
+  </script>
+
+</body>
+
+</html>
