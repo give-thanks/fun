@@ -1,0 +1,2 @@
+// state/types.ts
+export {};

@@ -50,10 +50,6 @@ body {
     transition: all 0.15s ease;
 }
 
-#input-container button:hover {
-    background-color: #d5d5d5;
-}
-
 #input-container button:active {
     background-color: #c7c7c7;
     transform: translateY(1px);
@@ -118,15 +114,147 @@ body {
     border: 1px solid #999;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
     transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.tile:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
 .word {
     text-align: center;
     padding: 8px;
     font-size: 0.9rem;
+
+    /* ensure text stays above marks */
+    position: relative;
+    z-index: 2;
+
+}
+
+/* ===== MARK LAYERS ===== */
+
+/* shared mark style */
+.mark {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60%;
+    height: 10px;
+    border-radius: 999px;
+    opacity: 0.9;
+    z-index: 0;
+}
+
+/* lane positions (fixed vertical system) */
+.mark-m2 {
+    top: 10%;
+    background: var(--mark-2, #4f8cff);
+}
+
+.mark-m4 {
+    top: 25%;
+    background: var(--mark-4, #a855f7);
+}
+
+.mark-m3 {
+    top: 65%;
+    background: var(--mark-3, #22c55e);
+}
+
+.mark-m1 {
+    top: 80%;
+    background: var(--mark-1, #f97316);
+}
+
+#sets-container {
+    max-width: 500px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.set-row {
+    padding: 8px 10px;
+    background: #fff;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #222;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ===== Pens (Color Selectors) ===== */
+#pens-container {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 16px auto 8px;
+}
+
+/* Hide default radio */
+.pen-option input {
+    display: none;
+}
+
+/* Clickable wrapper */
+.pen-option {
+    cursor: pointer;
+}
+
+/* Visual swatch */
+.pen-swatch {
+    display: block;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #888;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* Color variants */
+.pen-m1 {
+    background: var(--mark-1, #f97316);
+}
+
+.pen-m2 {
+    background: var(--mark-2, #4f8cff);
+}
+
+.pen-m3 {
+    background: var(--mark-3, #22c55e);
+}
+
+.pen-m4 {
+    background: var(--mark-4, #a855f7);
+}
+
+/* Selected state (radio behavior) */
+.pen-option input:checked+.pen-swatch {
+    box-shadow: 0 0 0 3px #222 inset;
+    transform: scale(1.1);
+}
+
+
+
+/* ===== Board Controls (New Board Button) ===== */
+#board-controls {
+    width: min(100%, 500px);
+    margin: 12px auto 0;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#new-board-button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #888;
+    background-color: #e0e0e0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+#new-board-button:active {
+    background-color: #c7c7c7;
+    transform: translateY(1px);
 }
