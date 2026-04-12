@@ -1,3 +1,5 @@
+// state.ts
+
 import { Tile } from "./tileParser.js";
 
 export type PersistedState = {

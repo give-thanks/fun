@@ -1,3 +1,4 @@
+// tileParser.ts
 export interface Tile {
     id: number;
     text: string;
