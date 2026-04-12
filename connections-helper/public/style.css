@@ -59,6 +59,12 @@ body {
     transform: translateY(1px);
 }
 
+#input-container button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 /* Center buttons on small screens */
 #input-container>div {
     display: flex;

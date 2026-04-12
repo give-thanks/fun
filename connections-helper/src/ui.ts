@@ -60,8 +60,10 @@ export function initUI() {
 
     inputField.addEventListener("input", () => {
         const tiles = parseTiles(inputField.value) || [];
+        finalizeButton.disabled = !isValidTileCount(tiles.length);
         renderTiles(tiles, true);
     });
+    finalizeButton.disabled = true;
 
     formatButton.addEventListener("click", () => {
         const tiles = parseTiles(inputField.value) || [];
@@ -69,12 +71,18 @@ export function initUI() {
     });
 
     finalizeButton.addEventListener("click", () => {
-        appState.tiles = parseTiles(inputField.value) || [];
+        const tiles = parseTiles(inputField.value) || [];
+        if (!isValidTileCount(tiles.length)) return;
+        appState.tiles = tiles;
         appState.remainingTiles = [...appState.tiles];
         saveState(appState.tiles, []);
         inputField.parentElement!.style.display = "none";
         renderTiles(appState.remainingTiles, false);
     });
+}
+
+function isValidTileCount(count: number) {
+    return count === 8 || count === 12 || count === 16;
 }
 
 function renderTiles(tileList: Tile[], readonly = true) {
