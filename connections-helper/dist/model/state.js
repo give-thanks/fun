@@ -1,5 +1,9 @@
 // state.ts
 export function saveState(tiles) {
+    if ((tiles === null || tiles === void 0 ? void 0 : tiles.length) < 1) {
+        history.pushState(null, "", "?v=1");
+        return;
+    }
     const state = {
         tiles: tiles.map(t => ({
             i: t.tile.id,

@@ -17,29 +17,67 @@
   </div>
 
   <div>
-    <div id="pens-container">
+    <div id="pens-container" class="hidden">
       <label class="pen-option">
         <input type="radio" name="pen" value="1" checked>
         <span class="pen-swatch pen-m1"></span>
       </label>
-    
+
       <label class="pen-option">
         <input type="radio" name="pen" value="2">
         <span class="pen-swatch pen-m2"></span>
       </label>
-    
+
       <label class="pen-option">
         <input type="radio" name="pen" value="3">
         <span class="pen-swatch pen-m3"></span>
       </label>
-    
+
       <label class="pen-option">
         <input type="radio" name="pen" value="4">
         <span class="pen-swatch pen-m4"></span>
       </label>
     </div>
     <div id="tiles-container"></div>
-    <div id="board-controls">
+    <div id="rows-container" class="hidden">
+      <div class="row" data-pen="1">
+        <div class="chips">
+        </div>
+        <div class="actions">
+          <button class="icon-btn correct">✔</button>
+          <button class="icon-btn close">1</button>
+          <button class="icon-btn cold">✕</button>
+        </div>
+      </div>
+      <div class="row" data-pen="2">
+        <div class="chips">
+        </div>
+        <div class="actions">
+          <button class="icon-btn correct">✔</button>
+          <button class="icon-btn close">1</button>
+          <button class="icon-btn cold">✕</button>
+        </div>
+      </div>
+      <div class="row" data-pen="3">
+        <div class="chips">
+        </div>
+        <div class="actions">
+          <button class="icon-btn correct">✔</button>
+          <button class="icon-btn close">1</button>
+          <button class="icon-btn cold">✕</button>
+        </div>
+      </div>
+      <div class="row" data-pen="4">
+        <div class="chips">
+        </div>
+        <div class="actions">
+          <button class="icon-btn correct">✔</button>
+          <button class="icon-btn close">1</button>
+          <button class="icon-btn cold">✕</button>
+        </div>
+      </div>
+    </div>
+    <div id="board-controls" class="hidden">
       <button id="new-board-button">New Board</button>
     </div>
   </div>

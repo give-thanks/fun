@@ -9,6 +9,8 @@ const formatButton = document.getElementById("format-button");
 const finalizeButton = document.getElementById("finalize-button");
 const tilesContainer = document.getElementById("tiles-container");
 const pensContainer = document.getElementById("pens-container");
+const rowsContainer = document.getElementById("rows-container");
+const boardControls = document.getElementById("board-controls");
 const newBoardButton = document.getElementById("new-board-button");
 export function initUI() {
     const loaded = loadState();
@@ -19,7 +21,7 @@ export function initUI() {
         activePen: 1,
     } : getState();
     subscribe(() => {
-        renderTiles(tilesContainer, pensContainer, onTileToggle);
+        renderTiles(tilesContainer, pensContainer, rowsContainer, boardControls, onTileToggle);
     });
     const unsubscribeRenderInput = subscribe(() => {
         renderInput(inputContainer, inputField, finalizeButton);

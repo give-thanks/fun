@@ -19,14 +19,24 @@ function isValid(tileCount: number) {
 
 export function renderTiles(
     tilesContainer: HTMLDivElement,
-    pensContainer:HTMLDivElement,
+    pensContainer: HTMLDivElement,
+    rowsContainer: HTMLDivElement,
+    boardControls: HTMLDivElement,
     onToggle: (id: number, dispatch: (action: any) => void) => void
 ) {
     const state = getState();
     
     pensContainer.classList.toggle("hidden", state.inputMode);
+    rowsContainer.classList.toggle("hidden", state.inputMode);
+    boardControls.classList.toggle("hidden", state.inputMode);
 
     tilesContainer.innerHTML = "";
+
+    const rows = rowsContainer.querySelectorAll('.row');
+    rows.forEach((row) => {
+        const chips = row.querySelectorAll('.chips');
+        chips.forEach(c => c.innerHTML = '');
+    });
 
     state.tiles.forEach(ts => {
         const div = document.createElement("div");
@@ -42,6 +52,13 @@ export function renderTiles(
             const markEl = document.createElement("div");
             markEl.className = `mark mark-m${m}`;
             div.appendChild(markEl);
+
+            const rowEl= rowsContainer.querySelector(`[data-pen="${m}"]`) as HTMLElement;
+            const chipsEl = rowEl.querySelector('.chips') as HTMLDivElement;
+            const chipEl = document.createElement("div");
+            chipEl.className = "chip";
+            chipEl.textContent = ts.tile.text;
+            chipsEl.appendChild(chipEl);
         });
 
         if (!state.inputMode) {
@@ -49,5 +66,13 @@ export function renderTiles(
         }
 
         tilesContainer.appendChild(div);
+    });
+
+    rows.forEach((row) => {
+        const buttons = row.querySelectorAll<HTMLButtonElement>('.icon-btn');
+        const chips = row.querySelectorAll('.chip');
+
+        const selectedFour = chips.length === 4;
+        buttons.forEach(b => b.disabled = !selectedFour);
     });
 }

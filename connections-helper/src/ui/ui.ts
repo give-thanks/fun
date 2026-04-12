@@ -13,6 +13,8 @@ const finalizeButton = document.getElementById("finalize-button") as HTMLButtonE
 
 const tilesContainer = document.getElementById("tiles-container") as HTMLDivElement;
 const pensContainer = document.getElementById("pens-container") as HTMLDivElement;
+const rowsContainer = document.getElementById("rows-container") as HTMLDivElement;
+const boardControls = document.getElementById("board-controls") as HTMLDivElement;
 const newBoardButton = document.getElementById("new-board-button") as HTMLButtonElement;
 
 export function initUI() {
@@ -26,7 +28,7 @@ export function initUI() {
     } : getState();
 
     subscribe(() => {
-        renderTiles(tilesContainer, pensContainer, onTileToggle);
+        renderTiles(tilesContainer, pensContainer, rowsContainer, boardControls, onTileToggle);
     });
 
     const unsubscribeRenderInput = subscribe(() => {

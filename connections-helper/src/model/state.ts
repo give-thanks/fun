@@ -12,6 +12,10 @@ export type PersistedState = {
 };
 
 export function saveState(tiles: TileState[]) {
+    if (tiles?.length < 1) {
+        history.pushState(null, "", "?v=1");
+        return;
+    }
     const state: PersistedState = {
         tiles: tiles.map(t => ({
             i: t.tile.id,

@@ -258,3 +258,116 @@ body {
     background-color: #c7c7c7;
     transform: translateY(1px);
 }
+
+/* ===== Row Layout ===== */
+
+#rows-container {
+    margin: 1em;
+}
+
+.row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    margin-bottom: 12px;
+    padding: 10px 12px;
+
+    border-radius: 10px;
+    border: 1px solid #ccc;
+
+    /* stronger color presence */
+    border-left: 16px solid var(--pen);
+}
+
+/* stronger but still soft tints */
+.row[data-pen="1"] {
+    --pen: #f97316;
+    background: linear-gradient(to right, #fed7aa, #fff);
+}
+
+.row[data-pen="2"] {
+    --pen: #4f8cff;
+    background: linear-gradient(to right, #bfdbfe, #fff);
+}
+
+.row[data-pen="3"] {
+    --pen: #22c55e;
+    background: linear-gradient(to right, #bbf7d0, #fff);
+}
+
+.row[data-pen="4"] {
+    --pen: #a855f7;
+    background: linear-gradient(to right, #e9d5ff, #fff);
+}
+
+/* ===== Chips ===== */
+.chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+}
+
+.chip {
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f1f1f1;
+    border: 1px solid #aaa;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ===== Actions ===== */
+.actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+
+/* icon buttons */
+.icon-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid #888;
+    background: #e0e0e0;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+    font-weight: bold;
+    transition: all 0.12s ease;
+}
+
+.icon-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* states */
+.correct {
+    background: #22c55e;
+    color: white;
+}
+
+.close {
+    background: #facc15;
+    color: #222;
+}
+
+.cold {
+    background: #60a5fa;
+    color: white;
+}
+
+.icon-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    filter: grayscale(40%);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
