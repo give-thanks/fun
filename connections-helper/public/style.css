@@ -1,35 +1,131 @@
-/* Grid container */
-#tiles-container {
-    display: grid;
-    grid-template-columns: repeat(4, 120px);
-    gap: 10px;
-    justify-content: center;
-    margin-top: 20px;
+/* ===== Base Styles ===== */
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 16px;
+    color: #222;
 }
 
-/* Tile styling */
+/* ===== Input Section ===== */
+#input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Monospace textarea */
+#tile-input {
+    width: 100%;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.95rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+/* Button container */
+#input-container>div {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+#input-container button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid #888;
+    /* neutral border */
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    /* mid gray (works on light + dark) */
+    color: #222;
+    /* not pure black */
+    transition: all 0.15s ease;
+}
+
+#input-container button:hover {
+    background-color: #d5d5d5;
+}
+
+#input-container button:active {
+    background-color: #c7c7c7;
+    transform: translateY(1px);
+}
+
+/* Center buttons on small screens */
+#input-container>div {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* ===== Responsive Layout ===== */
+@media (min-width: 700px) {
+    #input-container {
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    #tile-input {
+        flex: 1;
+    }
+
+    #input-container>div {
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #input-container button {
+        height: 100%;
+        min-width: 140px;
+    }
+}
+
+/* ===== Tiles Grid ===== */
+#tiles-container {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    width: min(100%, 500px);
+    margin: 24px auto 0;
+}
+
+/* ===== Tile ===== */
 .tile {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: space-between;
-    /* word stays centered between top/bottom */
-    width: 120px;
-    height: 120px;
+    aspect-ratio: 1 / 1;
     font-weight: bold;
-    border: 2px solid #333;
+    border-radius: 10px;
     position: relative;
     user-select: none;
-    background-color: #fff;
+    background-color: #f2f2f2;
+    border: 1px solid #999;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .word {
-    flex: none;
     text-align: center;
-    padding-top: 50px;
+    padding: 8px;
+    font-size: 0.9rem;
 }
 
-/* Quadrant overlay for category click */
+/* ===== Quadrants ===== */
 .quadrant {
     position: absolute;
     width: 50%;
@@ -37,7 +133,6 @@
     z-index: 2;
 }
 
-/* Quadrant positions */
 .quadrant.tl {
     top: 0;
     left: 0;
@@ -58,7 +153,7 @@
     right: 0;
 }
 
-/* Triangle category indicators */
+/* ===== Triangles ===== */
 .triangle {
     position: absolute;
     width: 50%;
@@ -92,22 +187,21 @@
     clip-path: polygon(100% 100%, 100% 0, 0 100%);
 }
 
-/* Reserve space for guess numbers in every tile */
+/* ===== Guess Numbers ===== */
 .guess-numbers {
     display: flex;
-    gap: 2px;
-    min-height: 24px;
-    /* reserve space for numbers even if empty */
+    gap: 4px;
+    min-height: 22px;
     justify-content: center;
-    padding: 10px;
+    padding-bottom: 6px;
 }
 
 .result-dot {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     color: #fff;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     font-weight: bold;
     display: flex;
     align-items: center;
@@ -118,98 +212,54 @@
     background-color: #28a745;
 }
 
-/* green */
 .result-dot.oneAway {
     background-color: #dc3545;
 }
 
-/* red */
 .result-dot.cold {
     background-color: #17a2b8;
 }
 
-/* blue */
-
-/* Guess panel container */
+/* ===== Guess Panels ===== */
 #guess-panel-container {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 20px;
+    gap: 10px;
+    margin-top: 24px;
     align-items: center;
 }
 
-/* Each guess panel */
 .guess-panel {
     display: flex;
-    align-items: center;
-    gap: 8px;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #ffffff;
     border-left: 6px solid #000;
-    /* dynamically set via JS */
-    padding: 6px 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Buttons inside guess panels */
+.guess-panel button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
     border-radius: 6px;
-    background-color: #f0f0f0;
-}
-
-/* Guess buttons */
-/* Guess buttons inside panels */
-.guess-panel button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    /* space between icon and text */
-    padding: 6px 12px;
-    /* internal padding */
-    border-radius: 4px;
     border: none;
-    font-weight: bold;
+    font-weight: 600;
+    font-size: 0.85rem;
     cursor: pointer;
     color: #fff;
-    min-width: 80px;
-    /* ensures all buttons are at least this wide */
-    height: 40px;
-    /* consistent height */
-    flex: 1;
-    /* optional: make buttons expand equally */
-}
-
-.guess-panel button .icon {
-    font-size: 1rem;
-}
-
-/* Optional: make all buttons equal width even if text differs */
-.guess-panel {
-    display: flex;
-    gap: 8px;
-}
-
-/* Guess buttons inside panels */
-.guess-panel button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    /* space between icon and text */
-    padding: 8px 16px;
-    /* more space for longer words */
-    border-radius: 4px;
-    border: none;
-    font-weight: bold;
-    font-size: 0.9rem;
-    /* slightly larger text */
-    cursor: pointer;
-    color: #fff;
-    min-width: 100px;
-    /* wider minimum width to avoid wrapping */
-    height: 48px;
-    /* taller button */
-    flex: none;
-    /* prevent shrinking */
     white-space: nowrap;
-    /* prevent wrapping text */
+    transition: opacity 0.15s, transform 0.05s;
 }
 
 .guess-panel button:hover {
     opacity: 0.85;
+}
+
+.guess-panel button:active {
+    transform: translateY(1px);
 }

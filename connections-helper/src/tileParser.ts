@@ -34,12 +34,32 @@ export function parseTiles(input: string): Tile[] {
 }
 
 export function formatTiles(tiles: Tile[]): string {
-    const rows: string[] = [];
+    const rows: string[][] = [];
+
+    // Step 1: chunk into rows of 4
     for (let i = 0; i < tiles.length; i += 4) {
-        const row = tiles.slice(i, i + 4).map(t => t.text);
-        rows.push(row.join("    "));
+        rows.push(tiles.slice(i, i + 4).map(t => t.text));
     }
-    return rows.join("\n");
+
+    // Step 2: compute max width per column
+    const colWidths: number[] = [];
+    for (const row of rows) {
+        row.forEach((cell, i) => {
+            colWidths[i] = Math.max(colWidths[i] || 0, cell.length);
+        });
+    }
+
+    // Step 3: build formatted rows
+    const formattedRows = rows.map(row =>
+        row
+            .map((cell, i) => {
+                const padded = cell.padEnd(colWidths[i], " ");
+                return i < row.length - 1 ? padded + "  " : padded; // spacing between cols
+            })
+            .join("")
+    );
+
+    return formattedRows.join("\n").trim();
 }
 
 export function checkBoxCount(tiles: Tile[]): boolean {

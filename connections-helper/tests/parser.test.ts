@@ -65,11 +65,11 @@ describe("Tile Parsing", () => {
 describe("Tile Formatting", () => {
 
   test("formats tiles into rows of 4 with spacing", () => {
-    const input = "APPLE  ORANGE  BANANA  GRAPE  MANGO  PINEAPPLE";
+    const input = "APPLE  ORANGE  BANANA  GRAPE  PINEAPPLE  MANGO";
     const tiles = parseTiles(input);
     const formatted = formatTiles(tiles);
-    expect(formatted).toMatch(/^APPLE\s+ORANGE\s+BANANA\s+GRAPE/);
-    expect(formatted).toMatch(/MANGO\s+PINEAPPLE$/);
+    expect(formatted).toMatch(/^APPLE\s{6}ORANGE\s+BANANA\s+GRAPE/);
+    expect(formatted).toMatch(/PINEAPPLE\s{2}MANGO$/);
   });
 
   test("preserves multi-word boxes", () => {
@@ -83,14 +83,14 @@ describe("Tile Formatting", () => {
     const input = "A  B  C  D";
     const tiles = parseTiles(input);
     const formatted = formatTiles(tiles);
-    expect(formatted.trim()).toBe("A    B    C    D");
+    expect(formatted.trim()).toBe("A  B  C  D");
   });
 
   test("formats fewer than 4 tiles into one row", () => {
     const input = "A  B  C";
     const tiles = parseTiles(input);
     const formatted = formatTiles(tiles);
-    expect(formatted.trim()).toBe("A    B    C");
+    expect(formatted.trim()).toBe("A  B  C");
   });
 
   test("formats more than 4 tiles into multiple rows", () => {
