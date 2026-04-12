@@ -1,0 +1,271 @@
+/* ===== Base Styles ===== */
+body {
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 16px;
+    color: #222;
+}
+
+/* ===== Input Section ===== */
+#input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Monospace textarea */
+#tile-input {
+    width: 100%;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 0.95rem;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    resize: vertical;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+/* Button container */
+#input-container>div {
+    display: flex;
+    gap: 10px;
+}
+
+/* Buttons */
+#input-container button {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1px solid #888;
+    /* neutral border */
+    font-weight: 600;
+    cursor: pointer;
+    background-color: #e0e0e0;
+    /* mid gray (works on light + dark) */
+    color: #222;
+    /* not pure black */
+    transition: all 0.15s ease;
+}
+
+#input-container button:hover {
+    background-color: #d5d5d5;
+}
+
+#input-container button:active {
+    background-color: #c7c7c7;
+    transform: translateY(1px);
+}
+
+#input-container button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Center buttons on small screens */
+#input-container>div {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* ===== Responsive Layout ===== */
+@media (min-width: 700px) {
+    #input-container {
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    #tile-input {
+        flex: 1;
+    }
+
+    #input-container>div {
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    #input-container button {
+        height: 100%;
+        min-width: 140px;
+    }
+}
+
+/* ===== Tiles Grid ===== */
+#tiles-container {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    width: min(100%, 500px);
+    margin: 24px auto 0;
+}
+
+/* ===== Tile ===== */
+.tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    aspect-ratio: 1 / 1;
+    font-weight: bold;
+    border-radius: 10px;
+    position: relative;
+    user-select: none;
+    background-color: #f2f2f2;
+    border: 1px solid #999;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.word {
+    text-align: center;
+    padding: 8px;
+    font-size: 0.9rem;
+}
+
+/* ===== Quadrants ===== */
+.quadrant {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    z-index: 2;
+}
+
+.quadrant.tl {
+    top: 0;
+    left: 0;
+}
+
+.quadrant.tr {
+    top: 0;
+    right: 0;
+}
+
+.quadrant.bl {
+    bottom: 0;
+    left: 0;
+}
+
+.quadrant.br {
+    bottom: 0;
+    right: 0;
+}
+
+/* ===== Triangles ===== */
+.triangle {
+    position: absolute;
+    width: 50%;
+    height: 50%;
+    z-index: 3;
+    pointer-events: none;
+    transition: opacity 0.2s;
+}
+
+.triangle.tl {
+    top: 0;
+    left: 0;
+    clip-path: polygon(0 0, 100% 0, 0 100%);
+}
+
+.triangle.tr {
+    top: 0;
+    right: 0;
+    clip-path: polygon(100% 0, 100% 100%, 0 0);
+}
+
+.triangle.bl {
+    bottom: 0;
+    left: 0;
+    clip-path: polygon(0 100%, 100% 100%, 0 0);
+}
+
+.triangle.br {
+    bottom: 0;
+    right: 0;
+    clip-path: polygon(100% 100%, 100% 0, 0 100%);
+}
+
+/* ===== Guess Numbers ===== */
+.guess-numbers {
+    display: flex;
+    gap: 4px;
+    min-height: 22px;
+    justify-content: center;
+    padding-bottom: 6px;
+}
+
+.result-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.result-dot.correct {
+    background-color: #28a745;
+}
+
+.result-dot.oneAway {
+    background-color: #dc3545;
+}
+
+.result-dot.cold {
+    background-color: #17a2b8;
+}
+
+/* ===== Guess Panels ===== */
+#guess-panel-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 24px;
+    align-items: center;
+}
+
+.guess-panel {
+    display: flex;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    border-left: 6px solid #000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Buttons inside guess panels */
+.guess-panel button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    color: #fff;
+    white-space: nowrap;
+    transition: opacity 0.15s, transform 0.05s;
+}
+
+.guess-panel button:hover {
+    opacity: 0.85;
+}
+
+.guess-panel button:active {
+    transform: translateY(1px);
+}
