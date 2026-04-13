@@ -2,7 +2,6 @@
 export interface Tile {
     id: number;
     text: string;
-    categories: Set<number>;
 }
 
 export function parseTiles(input: string): Tile[] {
@@ -25,7 +24,6 @@ export function parseTiles(input: string): Tile[] {
             tiles.push({
                 id: idCounter++,
                 text,
-                categories: new Set(),
             });
         }
     }
@@ -52,8 +50,8 @@ export function formatTiles(tiles: Tile[]): string {
     // Step 3: build formatted rows
     const formattedRows = rows.map(row =>
         row
-            .map((cell, i) => {
-                const padded = cell.padEnd(colWidths[i], " ");
+            .map((cell, i, array) => {
+                const padded = (i + 1 == array.length) ? cell : cell.padEnd(colWidths[i], " ");
                 return i < row.length - 1 ? padded + "  " : padded; // spacing between cols
             })
             .join("")

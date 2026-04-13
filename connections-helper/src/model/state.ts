@@ -1,0 +1,68 @@
+// state.ts
+
+import { Guess, GuessType, MarkId, TileState } from "../state/types.js";
+import { Tile } from "./tileParser.js";
+
+export type PersistedState = {
+    tiles: {
+        i: number;
+        t: string;
+        m: MarkId[];
+    }[],
+    guesses: {
+        t: number[];
+        r: GuessType;
+    }[]
+};
+
+export function saveState(tiles: TileState[], guesses: Guess[]) {
+    if (tiles?.length < 1) {
+        history.pushState(null, "", "?v=1");
+        return;
+    }
+    const state: PersistedState = {
+        tiles: tiles.map(t => ({
+            i: t.tile.id,
+            t: t.tile.text,
+            m: t.marks,
+        })),
+        guesses: guesses.map(g => ({
+            t: g.tileIds,
+            r: g.result,
+        }))
+    };
+
+    const encoded = encodeURIComponent(JSON.stringify(state));
+    history.pushState(null, "", `?v=1&s=${encoded}`);
+}
+
+export function loadState(): { tiles: TileState[], guesses: Guess[] } | null {
+    const params = new URLSearchParams(window.location.search);
+    const version = params.get("v");
+    if (version != '1') return null;
+    const encoded = params.get("s");
+    if (!encoded) return null;
+
+    try {
+        const parsed: PersistedState = JSON.parse(decodeURIComponent(encoded));
+
+        const tiles: TileState[] = parsed.tiles.map(t => ({
+            tile: {
+                id: t.i,
+                text: t.t,
+            },
+            marks: t.m,
+        }));
+
+        const guesses: Guess[] = parsed.guesses.map((g, i) => ({
+            id: i,
+            tileIds: g.t,
+            result: g.r
+        }))
+
+        return { tiles, guesses };
+    } catch {
+        console.warn("Failed to parse state from URL");
+        return null;
+    }
+}

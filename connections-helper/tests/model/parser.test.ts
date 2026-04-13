@@ -1,4 +1,4 @@
-import { parseTiles, formatTiles, checkBoxCount, Tile } from "../src/tileParser";
+import { parseTiles, formatTiles, checkBoxCount, Tile } from "../../src/model/tileParser";
 
 describe("Tile Parsing", () => {
 
