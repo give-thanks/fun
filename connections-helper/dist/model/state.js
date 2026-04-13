@@ -1,5 +1,5 @@
 // state.ts
-export function saveState(tiles) {
+export function saveState(tiles, guesses) {
     if ((tiles === null || tiles === void 0 ? void 0 : tiles.length) < 1) {
         history.pushState(null, "", "?v=1");
         return;
@@ -10,6 +10,10 @@ export function saveState(tiles) {
             t: t.tile.text,
             m: t.marks,
         })),
+        guesses: guesses.map(g => ({
+            t: g.tileIds,
+            r: g.result,
+        }))
     };
     const encoded = encodeURIComponent(JSON.stringify(state));
     history.pushState(null, "", `?v=1&s=${encoded}`);
@@ -31,7 +35,12 @@ export function loadState() {
             },
             marks: t.m,
         }));
-        return tiles;
+        const guesses = parsed.guesses.map((g, i) => ({
+            id: i,
+            tileIds: g.t,
+            result: g.r
+        }));
+        return { tiles, guesses };
     }
     catch (_a) {
         console.warn("Failed to parse state from URL");

@@ -1,2 +1,6 @@
 // state/types.ts
-export {};
+export const GuessType = {
+    Correct: "correct",
+    Cold: "cold",
+    Close: "close",
+};

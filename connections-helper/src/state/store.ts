@@ -9,6 +9,7 @@ let state: AppState = {
     inputMode: true,
     tiles: [],
     activePen: 1,
+    guesses:[],
 };
 
 let listeners: Map<number, () => void> = new Map();

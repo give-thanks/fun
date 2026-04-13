@@ -1,4 +1,5 @@
 import { dispatch, getState } from "../state/store.js";
+import { GuessType, MarkId } from "../state/types.js";
 
 export function bindInputEvents(
     inputField: HTMLTextAreaElement,
@@ -31,7 +32,7 @@ export function onTileToggle(
     });
 }
 
-export function bindBoardEvents(pensContainer: HTMLDivElement, newBoardButton: HTMLButtonElement) {
+export function bindBoardEvents(pensContainer: HTMLDivElement, rowsContainer: HTMLDivElement, newBoardButton: HTMLButtonElement) {
     pensContainer.addEventListener("change", (e) => {
         const target = e.target;
 
@@ -43,6 +44,31 @@ export function bindBoardEvents(pensContainer: HTMLDivElement, newBoardButton: H
             mark: Number(target.value),
         });
 
+    });
+
+    const rows = rowsContainer.querySelectorAll<HTMLDivElement>('.row');
+    rows.forEach((row) => {
+        const markId = Number(row.dataset.pen) as MarkId;
+
+        const buttons = row.querySelectorAll<HTMLButtonElement>(".icon-btn");
+
+        buttons.forEach((button) => {
+            button.addEventListener("click", () => {
+                let guessType: GuessType | null = null;
+
+                if (button.classList.contains("correct")) guessType = "correct";
+                else if (button.classList.contains("close")) guessType = "close";
+                else if (button.classList.contains("cold")) guessType = "cold";
+
+                if (!guessType) return; // safety
+
+                dispatch({
+                    type: "RECORD_GUESS",
+                    mark:markId,
+                    guessType
+                });
+            });
+        });
     });
 
     newBoardButton.addEventListener('click', () => {

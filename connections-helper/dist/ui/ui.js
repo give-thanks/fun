@@ -10,6 +10,7 @@ const finalizeButton = document.getElementById("finalize-button");
 const tilesContainer = document.getElementById("tiles-container");
 const pensContainer = document.getElementById("pens-container");
 const rowsContainer = document.getElementById("rows-container");
+const guessesContainer = document.getElementById("guesses-container");
 const boardControls = document.getElementById("board-controls");
 const newBoardButton = document.getElementById("new-board-button");
 export function initUI() {
@@ -17,11 +18,13 @@ export function initUI() {
     const state = loaded ? {
         input: '',
         inputMode: false,
-        tiles: loaded,
+        tiles: loaded.tiles,
         activePen: 1,
+        guesses: loaded.guesses,
     } : getState();
+    console.log(JSON.stringify(state));
     subscribe(() => {
-        renderTiles(tilesContainer, pensContainer, rowsContainer, boardControls, onTileToggle);
+        renderTiles(tilesContainer, pensContainer, rowsContainer, guessesContainer, boardControls, onTileToggle);
     });
     const unsubscribeRenderInput = subscribe(() => {
         renderInput(inputContainer, inputField, finalizeButton);
@@ -29,6 +32,6 @@ export function initUI() {
     if (!loaded) {
         bindInputEvents(inputField, formatButton, finalizeButton, dispatch);
     }
-    bindBoardEvents(pensContainer, newBoardButton);
+    bindBoardEvents(pensContainer, rowsContainer, newBoardButton);
     dispatch({ type: "INIT_LOADED", state });
 }

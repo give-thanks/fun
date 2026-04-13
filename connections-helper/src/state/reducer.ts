@@ -2,7 +2,7 @@
 
 import { saveState } from "../model/state.js";
 import { formatTiles, parseTiles, Tile } from "../model/tileParser.js";
-import { AppState, MarkId } from "./types.js";
+import { AppState, GuessType, MarkId } from "./types.js";
 
 type Action =
     | { type: "INPUT_CHANGED", input: string }
@@ -11,6 +11,7 @@ type Action =
     | { type: "INIT_LOADED"; state: AppState }
     | { type: "TOGGLE_MARK"; tileId: number; mark: MarkId }
     | { type: "SET_ACTIVE_PEN"; mark: MarkId }
+    | { type: "RECORD_GUESS"; mark: MarkId; guessType: GuessType }
     | { type: "NEW_BOARD"; };
 
 export function reducer(state: AppState, action: Action): AppState {
@@ -36,7 +37,7 @@ export function reducer(state: AppState, action: Action): AppState {
         case "FINALIZE_INPUT":
             {
                 const tiles = parseTiles(action.input).map(t => { return { tile: t, marks: [] } });
-                saveState(tiles);
+                saveState(tiles, state.guesses);
                 return {
                     ...state,
                     input: '',
@@ -61,7 +62,7 @@ export function reducer(state: AppState, action: Action): AppState {
             });
 
 
-            saveState(tiles);
+            saveState(tiles, state.guesses);
             return {
                 ...state,
                 tiles,
@@ -74,13 +75,35 @@ export function reducer(state: AppState, action: Action): AppState {
                 activePen: action.mark,
             };
 
+        case "RECORD_GUESS":
+            const tileIds = state.tiles
+                .filter(t => t.marks.indexOf(action.mark) >= 0)
+                .map(t => t.tile.id);
+            const guesses = [...state.guesses, {
+                id: state.guesses.length,
+                tileIds: tileIds,
+                result: action.guessType
+            }];
+            const tiles = (action.guessType == GuessType.Correct) ? state.tiles.map(t => ({
+                ...t,
+                marks: t.marks.filter(m => tileIds.indexOf(t.tile.id) < 0)
+            })) : state.tiles;
+            console.log(JSON.stringify(tiles));
+            saveState(tiles, guesses);
+            return {
+                ...state,
+                guesses,
+                tiles
+            };
+
         case "NEW_BOARD":
-            saveState([]);
+            saveState([], []);
             return {
                 activePen: 1,
                 input: '',
                 inputMode: true,
                 tiles: [],
+                guesses: [],
             }
 
         default:

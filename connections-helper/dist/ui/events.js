@@ -18,7 +18,7 @@ export function onTileToggle(id, dispatch) {
         mark: state.activePen,
     });
 }
-export function bindBoardEvents(pensContainer, newBoardButton) {
+export function bindBoardEvents(pensContainer, rowsContainer, newBoardButton) {
     pensContainer.addEventListener("change", (e) => {
         const target = e.target;
         if (!(target instanceof HTMLInputElement))
@@ -28,6 +28,29 @@ export function bindBoardEvents(pensContainer, newBoardButton) {
         dispatch({
             type: "SET_ACTIVE_PEN",
             mark: Number(target.value),
+        });
+    });
+    const rows = rowsContainer.querySelectorAll('.row');
+    rows.forEach((row) => {
+        const markId = Number(row.dataset.pen);
+        const buttons = row.querySelectorAll(".icon-btn");
+        buttons.forEach((button) => {
+            button.addEventListener("click", () => {
+                let guessType = null;
+                if (button.classList.contains("correct"))
+                    guessType = "correct";
+                else if (button.classList.contains("close"))
+                    guessType = "close";
+                else if (button.classList.contains("cold"))
+                    guessType = "cold";
+                if (!guessType)
+                    return; // safety
+                dispatch({
+                    type: "RECORD_GUESS",
+                    mark: markId,
+                    guessType
+                });
+            });
         });
     });
     newBoardButton.addEventListener('click', () => {

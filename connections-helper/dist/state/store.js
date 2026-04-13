@@ -5,6 +5,7 @@ let state = {
     inputMode: true,
     tiles: [],
     activePen: 1,
+    guesses: [],
 };
 let listeners = new Map();
 let nextId = 0;
