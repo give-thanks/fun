@@ -6,6 +6,7 @@ let state = {
     tiles: [],
     activePen: 1,
     guesses: [],
+    debugPartitions: true,
 };
 let listeners = new Map();
 let nextId = 0;

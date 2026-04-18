@@ -12,10 +12,17 @@ type Action =
     | { type: "TOGGLE_MARK"; tileId: number; mark: MarkId }
     | { type: "SET_ACTIVE_PEN"; mark: MarkId }
     | { type: "RECORD_GUESS"; mark: MarkId; guessType: GuessType }
-    | { type: "NEW_BOARD"; };
+    | { type: "CLEAR_GUESSES"; }
+    | { type: "TOGGLE_DEBUG_PARTITIONS"; }
+    | { type: "NEW_BOARD"; }
+    ;
 
 export function reducer(state: AppState, action: Action): AppState {
     switch (action.type) {
+
+        case "INIT_LOADED":
+            return action.state;
+
         case "INPUT_CHANGED":
             {
                 const tiles = parseTiles(action.input);
@@ -45,14 +52,11 @@ export function reducer(state: AppState, action: Action): AppState {
                     tiles: tiles
                 }
             }
-        case "INIT_LOADED":
-            return action.state;
-
 
         case "TOGGLE_MARK": {
 
             const tiles = state.tiles.map((t, i) => {
-                if (i !== action.tileId) {
+                if (i + 1 !== action.tileId) {
                     return t;
                 }
                 const wasMarked = t.marks.indexOf(action.mark) >= 0;
@@ -88,12 +92,24 @@ export function reducer(state: AppState, action: Action): AppState {
                 ...t,
                 marks: t.marks.filter(m => tileIds.indexOf(t.tile.id) < 0)
             })) : state.tiles;
-            console.log(JSON.stringify(tiles));
+
             saveState(tiles, guesses);
             return {
                 ...state,
                 guesses,
                 tiles
+            };
+
+        case "CLEAR_GUESSES":
+            return {
+                ...state,
+                guesses: [],
+            };
+
+        case "TOGGLE_DEBUG_PARTITIONS":
+            return {
+                ...state,
+                debugPartitions: !state.debugPartitions,
             };
 
         case "NEW_BOARD":
@@ -104,6 +120,7 @@ export function reducer(state: AppState, action: Action): AppState {
                 inputMode: true,
                 tiles: [],
                 guesses: [],
+                debugPartitions: state.debugPartitions
             }
 
         default:

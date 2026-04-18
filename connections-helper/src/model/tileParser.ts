@@ -9,7 +9,7 @@ export function parseTiles(input: string): Tile[] {
     const cleanedInput = input.replace(/\r\n|\r/g, "\n");
     const lines = cleanedInput.split("\n");
 
-    let idCounter = 0;
+    let idCounter = 1;
 
     for (const line of lines) {
         const trimmedLine = line.trim();

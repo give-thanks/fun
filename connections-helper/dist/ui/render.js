@@ -1,4 +1,6 @@
 // ui/render.ts
+import { validatePartition } from "../model/partitionLogic.js";
+import { PartitionGenerator } from "../precompute/partitionGenerator.js";
 import { dispatch, getState } from "../state/store.js";
 import { GuessType } from "../state/types.js";
 export function renderInput(inputContainer, inputField, finalizeButton) {
@@ -12,11 +14,12 @@ export function renderInput(inputContainer, inputField, finalizeButton) {
 function isValid(tileCount) {
     return tileCount == 8 || tileCount == 12 || tileCount == 16;
 }
-export function renderTiles(tilesContainer, pensContainer, rowsContainer, guessesContainer, boardControls, onToggle) {
+export function renderTiles(tilesContainer, pensContainer, rowsContainer, guessesContainer, partitionsContainer, boardControls, onToggle) {
     const state = getState();
     pensContainer.classList.toggle("hidden", state.inputMode);
     rowsContainer.classList.toggle("hidden", state.inputMode);
     guessesContainer.classList.toggle("hidden", state.inputMode);
+    partitionsContainer.classList.toggle("hidden", state.inputMode);
     boardControls.classList.toggle("hidden", state.inputMode);
     tilesContainer.innerHTML = "";
     const rows = rowsContainer.querySelectorAll('.row');
@@ -24,7 +27,12 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         const chips = row.querySelectorAll('.chips');
         chips.forEach(c => c.innerHTML = '');
     });
-    state.tiles
+    const remainingTiles = state.tiles.filter(ts => {
+        const correctGuesses = state.guesses.filter(g => g.result == GuessType.Correct && g.tileIds.indexOf(ts.tile.id) >= 0);
+        return correctGuesses.length == 0;
+    });
+    // state.tiles
+    remainingTiles
         .forEach(ts => {
         const div = document.createElement("div");
         div.className = "tile";
@@ -74,4 +82,51 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         });
         guessesContainer.appendChild(div);
     });
+    console.log(remainingTiles);
+    if (remainingTiles.length < 16) {
+        const gen = new PartitionGenerator(remainingTiles.map(t => t.tile.id));
+        const result = gen.generate();
+        const idToTile = new Map(remainingTiles.map(t => [t.tile.id, t.tile]));
+        const partitions = result.map(partition => partition.map(group => group.map(id => idToTile.get(id))
+            .sort((a, b) => a.text.localeCompare(b.text)))).sort((a, b) => {
+            var _a, _b, _c, _d;
+            const aText = (_b = (_a = a[0][0]) === null || _a === void 0 ? void 0 : _a.text) !== null && _b !== void 0 ? _b : "";
+            const bText = (_d = (_c = b[0][0]) === null || _c === void 0 ? void 0 : _c.text) !== null && _d !== void 0 ? _d : "";
+            return aText.localeCompare(bText);
+        });
+        partitionsContainer.innerHTML = '<div id="count"></div>';
+        partitions.forEach((p, i) => {
+            const partitionDiv = document.createElement("div");
+            partitionDiv.classList = 'partition';
+            state.guesses.forEach(g => {
+                if (g.result !== GuessType.Correct) {
+                    const valid = validatePartition(p, state.guesses);
+                    if (!valid) {
+                        if (g.result == GuessType.Cold)
+                            partitionDiv.classList.add('invalid-cold');
+                        if (g.result == GuessType.Close)
+                            partitionDiv.classList.add('invalid-warm');
+                        if (!state.debugPartitions) {
+                            partitionDiv.classList.add('hidden');
+                        }
+                    }
+                }
+            });
+            p.forEach(set => {
+                const setDiv = document.createElement("div");
+                setDiv.className = 'group';
+                partitionDiv.appendChild(setDiv);
+                set.forEach(t => {
+                    const chip = document.createElement("div");
+                    chip.className = `element`;
+                    chip.textContent = t.text;
+                    setDiv.appendChild(chip);
+                });
+            });
+            partitionsContainer.appendChild(partitionDiv);
+        });
+        const countDiv = partitionsContainer.querySelector("#count");
+        if (countDiv)
+            countDiv.innerHTML = `${partitionsContainer.querySelectorAll('.partition:not(.hidden)').length}/${partitionsContainer.querySelectorAll('.partition').length}`;
+    }
 }

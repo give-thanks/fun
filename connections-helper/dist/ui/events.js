@@ -18,7 +18,7 @@ export function onTileToggle(id, dispatch) {
         mark: state.activePen,
     });
 }
-export function bindBoardEvents(pensContainer, rowsContainer, newBoardButton) {
+export function bindBoardEvents(pensContainer, rowsContainer, guessesContainer, partitionsContainer, newBoardButton) {
     pensContainer.addEventListener("change", (e) => {
         const target = e.target;
         if (!(target instanceof HTMLInputElement))
@@ -52,6 +52,12 @@ export function bindBoardEvents(pensContainer, rowsContainer, newBoardButton) {
                 });
             });
         });
+    });
+    guessesContainer.addEventListener('dblclick', () => {
+        dispatch({ type: "CLEAR_GUESSES" });
+    });
+    partitionsContainer.addEventListener('click', () => {
+        dispatch({ type: "TOGGLE_DEBUG_PARTITIONS" });
     });
     newBoardButton.addEventListener('click', () => {
         dispatch({ type: "NEW_BOARD" });

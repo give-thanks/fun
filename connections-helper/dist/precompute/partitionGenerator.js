@@ -1,8 +1,27 @@
 // partitionGenerator.ts
 export class PartitionGenerator {
     constructor(tiles) {
-        this.tiles = tiles;
+        this.tiles = tiles.sort();
     }
+    /**
+     * Generates all unique partitions of the input elements into disjoint groups of size 4.
+     *
+     * A partition is a complete division of the input set such that:
+     * - Every element appears in exactly one group
+     * - Each group (block) contains exactly 4 elements
+     * - No groups overlap within a partition
+     *
+     * The result is an array of partitions, where:
+     * - Each partition is an array of groups
+     * - Each group is an array of 4 element IDs
+     *
+     * Partitions are returned in canonical form:
+     * - Elements within each group are sorted
+     * - Groups within each partition are sorted
+     * - Duplicate partitions (ignoring ordering) are removed
+     *
+     * @returns Array of partitions (number[][][])
+     */
     generate() {
         // returns array of partitions, each partition = array of groups, each group = array of 4 tile IDs
         const partitions = [];

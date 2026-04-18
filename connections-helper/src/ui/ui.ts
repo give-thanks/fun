@@ -15,6 +15,7 @@ const tilesContainer = document.getElementById("tiles-container") as HTMLDivElem
 const pensContainer = document.getElementById("pens-container") as HTMLDivElement;
 const rowsContainer = document.getElementById("rows-container") as HTMLDivElement;
 const guessesContainer = document.getElementById("guesses-container") as HTMLDivElement;
+const partitionsContainer = document.getElementById("partitions-container") as HTMLDivElement;
 const boardControls = document.getElementById("board-controls") as HTMLDivElement;
 const newBoardButton = document.getElementById("new-board-button") as HTMLButtonElement;
 
@@ -27,11 +28,12 @@ export function initUI() {
         tiles: loaded.tiles,
         activePen: 1,
         guesses: loaded.guesses,
+        debugPartitions: false,
     } : getState();
     console.log(JSON.stringify(state))
 
     subscribe(() => {
-        renderTiles(tilesContainer, pensContainer, rowsContainer, guessesContainer, boardControls, onTileToggle);
+        renderTiles(tilesContainer, pensContainer, rowsContainer, guessesContainer, partitionsContainer, boardControls, onTileToggle);
     });
 
     const unsubscribeRenderInput = subscribe(() => {
@@ -42,7 +44,7 @@ export function initUI() {
         bindInputEvents(inputField, formatButton, finalizeButton, dispatch);
     }
 
-    bindBoardEvents(pensContainer, rowsContainer, newBoardButton);
+    bindBoardEvents(pensContainer, rowsContainer, guessesContainer, partitionsContainer, newBoardButton);
 
     dispatch({ type: "INIT_LOADED", state });
 }

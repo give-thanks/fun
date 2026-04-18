@@ -4,6 +4,8 @@ import { formatTiles, parseTiles } from "../model/tileParser.js";
 import { GuessType } from "./types.js";
 export function reducer(state, action) {
     switch (action.type) {
+        case "INIT_LOADED":
+            return action.state;
         case "INPUT_CHANGED":
             {
                 const tiles = parseTiles(action.input);
@@ -20,11 +22,9 @@ export function reducer(state, action) {
                 saveState(tiles, state.guesses);
                 return Object.assign(Object.assign({}, state), { input: '', inputMode: false, tiles: tiles });
             }
-        case "INIT_LOADED":
-            return action.state;
         case "TOGGLE_MARK": {
             const tiles = state.tiles.map((t, i) => {
-                if (i !== action.tileId) {
+                if (i + 1 !== action.tileId) {
                     return t;
                 }
                 const wasMarked = t.marks.indexOf(action.mark) >= 0;
@@ -48,10 +48,13 @@ export function reducer(state, action) {
                     result: action.guessType
                 }];
             const tiles = (action.guessType == GuessType.Correct) ? state.tiles.map(t => (Object.assign(Object.assign({}, t), { marks: t.marks.filter(m => tileIds.indexOf(t.tile.id) < 0) }))) : state.tiles;
-            console.log(JSON.stringify(tiles));
             saveState(tiles, guesses);
             return Object.assign(Object.assign({}, state), { guesses,
                 tiles });
+        case "CLEAR_GUESSES":
+            return Object.assign(Object.assign({}, state), { guesses: [] });
+        case "TOGGLE_DEBUG_PARTITIONS":
+            return Object.assign(Object.assign({}, state), { debugPartitions: !state.debugPartitions });
         case "NEW_BOARD":
             saveState([], []);
             return {
@@ -60,6 +63,7 @@ export function reducer(state, action) {
                 inputMode: true,
                 tiles: [],
                 guesses: [],
+                debugPartitions: state.debugPartitions
             };
         default:
             return state;

@@ -32,7 +32,12 @@ export function onTileToggle(
     });
 }
 
-export function bindBoardEvents(pensContainer: HTMLDivElement, rowsContainer: HTMLDivElement, newBoardButton: HTMLButtonElement) {
+export function bindBoardEvents(
+    pensContainer: HTMLDivElement,
+    rowsContainer: HTMLDivElement,
+    guessesContainer: HTMLDivElement,
+    partitionsContainer: HTMLDivElement,
+    newBoardButton: HTMLButtonElement) {
     pensContainer.addEventListener("change", (e) => {
         const target = e.target;
 
@@ -64,13 +69,19 @@ export function bindBoardEvents(pensContainer: HTMLDivElement, rowsContainer: HT
 
                 dispatch({
                     type: "RECORD_GUESS",
-                    mark:markId,
+                    mark: markId,
                     guessType
                 });
             });
         });
     });
 
+    guessesContainer.addEventListener('dblclick', () => {
+        dispatch({ type: "CLEAR_GUESSES" })
+    });
+    partitionsContainer.addEventListener('click', () => {
+        dispatch({ type: "TOGGLE_DEBUG_PARTITIONS" })
+    });
     newBoardButton.addEventListener('click', () => {
         dispatch({ type: "NEW_BOARD" })
     });

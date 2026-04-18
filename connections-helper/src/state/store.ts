@@ -1,6 +1,5 @@
 // state/store.ts
 
-import { saveState } from "../model/state.js";
 import { reducer } from "./reducer.js";
 import { AppState, Unsubscribe } from "./types.js";
 
@@ -9,7 +8,8 @@ let state: AppState = {
     inputMode: true,
     tiles: [],
     activePen: 1,
-    guesses:[],
+    guesses: [],
+    debugPartitions: true,
 };
 
 let listeners: Map<number, () => void> = new Map();
@@ -24,7 +24,7 @@ export function dispatch(action: any) {
     listeners.forEach(l => l());
 }
 
-export function subscribe(listener: () => void):Unsubscribe {
+export function subscribe(listener: () => void): Unsubscribe {
     const id = nextId++;
     listeners.set(id, listener);
 

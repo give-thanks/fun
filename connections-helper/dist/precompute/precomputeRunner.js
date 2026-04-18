@@ -4,11 +4,13 @@ import path from 'path';
 import { PartitionGenerator } from './partitionGenerator';
 import { GroupMapBuilder } from './groupMapBuilder';
 function run(N) {
+    console.time(`run ${N}`);
     const tiles = Array.from({ length: N * 4 }, (_, i) => i);
     const generator = new PartitionGenerator(tiles);
     const partitions = generator.generate();
     const builder = new GroupMapBuilder(partitions);
     const groupMap = builder.buildMap();
+    console.timeEnd(`run ${N}`);
     const dir = path.join(__dirname, '../../dist/data');
     // Ensure the folder exists
     if (!fs.existsSync(dir)) {

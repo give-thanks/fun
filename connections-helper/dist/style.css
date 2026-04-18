@@ -465,3 +465,98 @@ body {
     border: 1px solid #bbb;
     color: #222;
 }
+
+#partitions-container {
+    max-width: 1000px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.partition {
+    display: flex;
+    gap: 8px;
+
+    padding: 6px 8px;
+    margin: 0;
+
+    position: relative;
+
+    /* row container feel without “card overload” */
+    background: #fafafa;
+    border: 1px solid #f1f5f9;
+    border-radius: 10px;
+}
+
+/* centered micro separator BETWEEN rows */
+.partition:not(:first-child)::before {
+    content: "";
+    position: absolute;
+
+    top: -4px;
+    left: 14px;
+    right: 14px;
+
+    height: 1px;
+
+    background-image: linear-gradient(to right,
+            #c0c7d1 50%,
+            transparent 0%);
+    background-size: 5px 1px;
+    background-repeat: repeat-x;
+}
+
+/* base group */
+.partition .group {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+
+    flex: 1;
+
+    padding: 8px;
+    border-radius: 10px;
+
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+
+    /* mobile centering */
+    justify-items: center;
+    align-items: center;
+
+    /* keep it light */
+    box-shadow: none;
+}
+
+.partition.invalid-warm::before,
+.partition.invalid-cold::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: 3px;
+}
+
+.partition.invalid-warm {
+    border-left: 3px solid #c9a227;
+    background: #faf7f0;
+    opacity: 0.75;
+}
+
+.partition.invalid-cold {
+    border-left: 3px solid #6b8fbf;
+    background: #f3f6fb;
+    opacity: 0.75;
+}
+
+.partition.invalid-warm::after,
+.partition.invalid-cold::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.35);
+    pointer-events: none;
+}
