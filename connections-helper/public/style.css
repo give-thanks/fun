@@ -117,6 +117,10 @@ body {
     overflow: hidden;
 }
 
+.tile.invalid{
+    background-color: lightgray;
+}
+
 .word {
     text-align: center;
     padding: 8px;
@@ -161,22 +165,6 @@ body {
 .mark-m1 {
     top: 80%;
     background: var(--mark-1, #f97316);
-}
-
-#sets-container {
-    max-width: 500px;
-    margin: 20px auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.set-row {
-    padding: 8px 10px;
-    background: #fff;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    color: #222;
 }
 
 .hidden {
@@ -263,6 +251,10 @@ body {
 
 #rows-container {
     margin: 1em;
+    max-width: 1000px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
 }
 
 .row {
@@ -467,7 +459,7 @@ body {
 }
 
 #partitions-container {
-    max-width: 1000px;
+    /* max-width: 1000px; */
     margin: 20px auto;
     display: flex;
     flex-direction: column;
@@ -559,4 +551,8 @@ body {
     inset: 0;
     background: rgba(255, 255, 255, 0.35);
     pointer-events: none;
+}
+
+.partition.selected .group{
+    background-color: lightyellow;
 }

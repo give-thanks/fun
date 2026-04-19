@@ -21,21 +21,16 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
     guessesContainer.classList.toggle("hidden", state.inputMode);
     partitionsContainer.classList.toggle("hidden", state.inputMode);
     boardControls.classList.toggle("hidden", state.inputMode);
-    tilesContainer.innerHTML = "";
-    const rows = rowsContainer.querySelectorAll('.row');
-    rows.forEach((row) => {
-        const chips = row.querySelectorAll('.chips');
-        chips.forEach(c => c.innerHTML = '');
-    });
     const remainingTiles = state.tiles.filter(ts => {
         const correctGuesses = state.guesses.filter(g => g.result == GuessType.Correct && g.tileIds.indexOf(ts.tile.id) >= 0);
         return correctGuesses.length == 0;
     });
-    // state.tiles
+    tilesContainer.innerHTML = "";
     remainingTiles
         .forEach(ts => {
         const div = document.createElement("div");
         div.className = "tile";
+        div.id = `tile-${ts.tile.id}`;
         const word = document.createElement("div");
         word.className = "word";
         word.textContent = ts.tile.text;
@@ -57,6 +52,11 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         const correctGuesses = state.guesses.filter(g => g.result == GuessType.Correct && g.tileIds.indexOf(ts.tile.id) >= 0);
         div.classList.toggle("hidden", correctGuesses.length > 0);
         tilesContainer.appendChild(div);
+    });
+    const rows = rowsContainer.querySelectorAll('.row');
+    rows.forEach((row) => {
+        const chips = row.querySelectorAll('.chips');
+        chips.forEach(c => c.innerHTML = '');
     });
     rows.forEach((row) => {
         const buttons = row.querySelectorAll('.icon-btn');
@@ -82,8 +82,10 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         });
         guessesContainer.appendChild(div);
     });
-    console.log(remainingTiles);
+    // console.log(remainingTiles);
+    partitionsContainer.innerHTML = '<div id="count"></div>';
     if (remainingTiles.length < 16) {
+        // console.time('build partitions');
         const gen = new PartitionGenerator(remainingTiles.map(t => t.tile.id));
         const result = gen.generate();
         const idToTile = new Map(remainingTiles.map(t => [t.tile.id, t.tile]));
@@ -94,39 +96,81 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
             const bText = (_d = (_c = b[0][0]) === null || _c === void 0 ? void 0 : _c.text) !== null && _d !== void 0 ? _d : "";
             return aText.localeCompare(bText);
         });
-        partitionsContainer.innerHTML = '<div id="count"></div>';
-        partitions.forEach((p, i) => {
-            const partitionDiv = document.createElement("div");
-            partitionDiv.classList = 'partition';
-            state.guesses.forEach(g => {
-                if (g.result !== GuessType.Correct) {
-                    const valid = validatePartition(p, state.guesses);
-                    if (!valid) {
-                        if (g.result == GuessType.Cold)
-                            partitionDiv.classList.add('invalid-cold');
-                        if (g.result == GuessType.Close)
-                            partitionDiv.classList.add('invalid-warm');
-                        if (!state.debugPartitions) {
-                            partitionDiv.classList.add('hidden');
+        // console.timeEnd('build partitions');
+        // console.time('validate partitions');
+        const partitionValidity = partitions.map(p => validatePartition(p, state.guesses));
+        const validPartitionCount = partitionValidity.filter(v => v).length;
+        // console.timeEnd('validate partitions');
+        // console.log(`${validPartitionCount} valid options out of ${partitions.length} possible solutions`);
+        // console.time('filter partitions');
+        const selectedTiles = state.tiles.filter(ts => ts.marks.some((m) => (m == state.activePen)));
+        // console.log(`selected tiles count ${selectedTiles.length}`);
+        // If there are 2 or 3 selected tiles, filter partitions to only those containing all the selected tiles in one group.
+        const showBasedOnSelected = selectedTiles.length == 2 || selectedTiles.length == 3;
+        const partitionsForSelected = partitions.map(p => p.some(group => group.filter(t => selectedTiles.some(st => st.tile.id == t.id)).length == selectedTiles.length));
+        // console.timeEnd('filter partitions');
+        // If there are 2 or 3 selected tiles, let's show what works based on those tiles
+        if (showBasedOnSelected)
+            remainingTiles.forEach(ts => {
+                var _a;
+                // If the tile is not selected for the active pen,
+                const markedForActivePen = ts.marks.some(m => m == state.activePen);
+                if (!markedForActivePen) {
+                    // If there are no valid partitions containing a group that includes both the selected tiles and this tile
+                    // then this tile isn't a valid option
+                    const valid = partitions.some((p, i) => partitionValidity[i] && p.some(group => group.filter(t => {
+                        // tile is either selected or the current tile
+                        return t.id == ts.tile.id || selectedTiles.some(t2 => t2.tile.id == t.id);
+                    }).length == selectedTiles.length + 1));
+                    // console.log(`${ts.tile.text} ${valid}`)
+                    const tileDiv = tilesContainer.querySelector(`#tile-${ts.tile.id}`);
+                    (_a = tileDiv === null || tileDiv === void 0 ? void 0 : tileDiv.classList) === null || _a === void 0 ? void 0 : _a.toggle('invalid', !valid);
+                }
+            });
+        if (validPartitionCount < 1000) {
+            partitions.forEach((p, i) => {
+                const partitionDiv = document.createElement("div");
+                partitionDiv.classList = 'partition';
+                const validPartition = partitionValidity[i];
+                if (!validPartition) {
+                    if (state.guesses.some(g => g.result == GuessType.Cold))
+                        partitionDiv.classList.add('invalid-cold');
+                    if (state.guesses.some(g => g.result == GuessType.Close))
+                        partitionDiv.classList.add('invalid-warm');
+                    if (!state.debugPartitions) {
+                        partitionDiv.classList.add('hidden');
+                    }
+                }
+                else {
+                    if (showBasedOnSelected) {
+                        const selectedPartition = partitionsForSelected[i];
+                        if (selectedPartition) {
+                            if (state.debugPartitions)
+                                partitionDiv.classList.add('selected');
+                        }
+                        else {
+                            if (!state.debugPartitions) {
+                                partitionDiv.classList.add('hidden');
+                            }
                         }
                     }
                 }
-            });
-            p.forEach(set => {
-                const setDiv = document.createElement("div");
-                setDiv.className = 'group';
-                partitionDiv.appendChild(setDiv);
-                set.forEach(t => {
-                    const chip = document.createElement("div");
-                    chip.className = `element`;
-                    chip.textContent = t.text;
-                    setDiv.appendChild(chip);
+                p.forEach(set => {
+                    const setDiv = document.createElement("div");
+                    setDiv.className = 'group';
+                    partitionDiv.appendChild(setDiv);
+                    set.forEach(t => {
+                        const chip = document.createElement("div");
+                        chip.className = `element`;
+                        chip.textContent = t.text;
+                        setDiv.appendChild(chip);
+                    });
                 });
+                partitionsContainer.appendChild(partitionDiv);
             });
-            partitionsContainer.appendChild(partitionDiv);
-        });
-        const countDiv = partitionsContainer.querySelector("#count");
-        if (countDiv)
-            countDiv.innerHTML = `${partitionsContainer.querySelectorAll('.partition:not(.hidden)').length}/${partitionsContainer.querySelectorAll('.partition').length}`;
+            const countDiv = partitionsContainer.querySelector("#count");
+            if (countDiv)
+                countDiv.innerHTML = `${validPartitionCount}/${partitions.length}`;
+        }
     }
 }

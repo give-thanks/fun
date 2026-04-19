@@ -24,16 +24,14 @@ export function initUI() {
         guesses: loaded.guesses,
         debugPartitions: false,
     } : getState();
-    console.log(JSON.stringify(state));
+    // console.log(JSON.stringify(state))
     subscribe(() => {
         renderTiles(tilesContainer, pensContainer, rowsContainer, guessesContainer, partitionsContainer, boardControls, onTileToggle);
     });
     const unsubscribeRenderInput = subscribe(() => {
         renderInput(inputContainer, inputField, finalizeButton);
     });
-    if (!loaded) {
-        bindInputEvents(inputField, formatButton, finalizeButton, dispatch);
-    }
+    bindInputEvents(inputField, formatButton, finalizeButton, dispatch);
     bindBoardEvents(pensContainer, rowsContainer, guessesContainer, partitionsContainer, newBoardButton);
     dispatch({ type: "INIT_LOADED", state });
 }
