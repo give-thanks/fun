@@ -25,6 +25,11 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         const correctGuesses = state.guesses.filter(g => g.result == GuessType.Correct && g.tileIds.indexOf(ts.tile.id) >= 0);
         return correctGuesses.length == 0;
     });
+    const rows = rowsContainer.querySelectorAll('.row');
+    rows.forEach((row) => {
+        const chips = row.querySelectorAll('.chips');
+        chips.forEach(c => c.innerHTML = '');
+    });
     tilesContainer.innerHTML = "";
     remainingTiles
         .forEach(ts => {
@@ -53,17 +58,6 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         div.classList.toggle("hidden", correctGuesses.length > 0);
         tilesContainer.appendChild(div);
     });
-    const rows = rowsContainer.querySelectorAll('.row');
-    rows.forEach((row) => {
-        const chips = row.querySelectorAll('.chips');
-        chips.forEach(c => c.innerHTML = '');
-    });
-    rows.forEach((row) => {
-        const buttons = row.querySelectorAll('.icon-btn');
-        const chips = row.querySelectorAll('.chip');
-        const selectedFour = chips.length === 4;
-        buttons.forEach(b => b.disabled = !selectedFour);
-    });
     guessesContainer.innerHTML = '';
     state.guesses.forEach(g => {
         if (g.result == GuessType.Correct)
@@ -81,6 +75,12 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
             chips.appendChild(chip);
         });
         guessesContainer.appendChild(div);
+    });
+    rows.forEach((row) => {
+        const buttons = row.querySelectorAll('.icon-btn');
+        const chips = row.querySelectorAll('.chip');
+        const selectedFour = chips.length === 4;
+        buttons.forEach(b => b.disabled = !selectedFour);
     });
     // console.log(remainingTiles);
     partitionsContainer.innerHTML = '<div id="count"></div>';

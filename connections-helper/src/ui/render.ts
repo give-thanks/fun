@@ -43,6 +43,12 @@ export function renderTiles(
         return correctGuesses.length == 0;
     });
 
+    const rows = rowsContainer.querySelectorAll('.row');
+    rows.forEach((row) => {
+        const chips = row.querySelectorAll('.chips');
+        chips.forEach(c => c.innerHTML = '');
+    });
+
     tilesContainer.innerHTML = "";
     remainingTiles
         .forEach(ts => {
@@ -79,20 +85,6 @@ export function renderTiles(
             tilesContainer.appendChild(div);
         });
 
-    const rows = rowsContainer.querySelectorAll('.row');
-    rows.forEach((row) => {
-        const chips = row.querySelectorAll('.chips');
-        chips.forEach(c => c.innerHTML = '');
-    });
-
-    rows.forEach((row) => {
-        const buttons = row.querySelectorAll<HTMLButtonElement>('.icon-btn');
-        const chips = row.querySelectorAll('.chip');
-
-        const selectedFour = chips.length === 4;
-        buttons.forEach(b => b.disabled = !selectedFour);
-    });
-
     guessesContainer.innerHTML = '';
     state.guesses.forEach(g => {
         if (g.result == GuessType.Correct) return;
@@ -113,6 +105,14 @@ export function renderTiles(
 
 
         guessesContainer.appendChild(div);
+    });
+
+    rows.forEach((row) => {
+        const buttons = row.querySelectorAll<HTMLButtonElement>('.icon-btn');
+        const chips = row.querySelectorAll('.chip');
+
+        const selectedFour = chips.length === 4;
+        buttons.forEach(b => b.disabled = !selectedFour);
     });
 
     // console.log(remainingTiles);
