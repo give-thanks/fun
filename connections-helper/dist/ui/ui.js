@@ -1,5 +1,6 @@
 // ui/ui.ts
 import { loadState } from "../model/state.js";
+import { determineValidTiles } from "../model/validTiles.js";
 import { dispatch, getState, subscribe } from "../state/store.js";
 import { bindBoardEvents, bindInputEvents, onTileToggle } from "./events.js";
 import { renderInput, renderTiles } from "./render.js";
@@ -22,6 +23,7 @@ export function initUI() {
         tiles: loaded.tiles,
         activePen: 1,
         guesses: loaded.guesses,
+        validTileIds: determineValidTiles(loaded.tiles, 1, loaded.guesses),
         debugPartitions: false,
     } : getState();
     // console.log(JSON.stringify(state))

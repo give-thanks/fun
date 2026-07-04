@@ -1,6 +1,7 @@
 {
   "name": "connections-helper",
   "version": "1.0.0",
+  
   "scripts": {
     "build": "tsc && cpy 'public/*' dist/",
     "test": "jest",

@@ -56,6 +56,8 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         }
         const correctGuesses = state.guesses.filter(g => g.result == GuessType.Correct && g.tileIds.indexOf(ts.tile.id) >= 0);
         div.classList.toggle("hidden", correctGuesses.length > 0);
+        const valid = state.validTileIds.indexOf(ts.tile.id) !== -1;
+        div.classList.toggle('invalid', !valid);
         tilesContainer.appendChild(div);
     });
     guessesContainer.innerHTML = '';
@@ -109,24 +111,6 @@ export function renderTiles(tilesContainer, pensContainer, rowsContainer, guesse
         const showBasedOnSelected = selectedTiles.length == 2 || selectedTiles.length == 3;
         const partitionsForSelected = partitions.map(p => p.some(group => group.filter(t => selectedTiles.some(st => st.tile.id == t.id)).length == selectedTiles.length));
         // console.timeEnd('filter partitions');
-        // If there are 2 or 3 selected tiles, let's show what works based on those tiles
-        if (showBasedOnSelected)
-            remainingTiles.forEach(ts => {
-                var _a;
-                // If the tile is not selected for the active pen,
-                const markedForActivePen = ts.marks.some(m => m == state.activePen);
-                if (!markedForActivePen) {
-                    // If there are no valid partitions containing a group that includes both the selected tiles and this tile
-                    // then this tile isn't a valid option
-                    const valid = partitions.some((p, i) => partitionValidity[i] && p.some(group => group.filter(t => {
-                        // tile is either selected or the current tile
-                        return t.id == ts.tile.id || selectedTiles.some(t2 => t2.tile.id == t.id);
-                    }).length == selectedTiles.length + 1));
-                    // console.log(`${ts.tile.text} ${valid}`)
-                    const tileDiv = tilesContainer.querySelector(`#tile-${ts.tile.id}`);
-                    (_a = tileDiv === null || tileDiv === void 0 ? void 0 : tileDiv.classList) === null || _a === void 0 ? void 0 : _a.toggle('invalid', !valid);
-                }
-            });
         if (validPartitionCount < 1000) {
             partitions.forEach((p, i) => {
                 const partitionDiv = document.createElement("div");

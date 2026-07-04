@@ -29,6 +29,7 @@ export interface AppState {
     tiles: TileState[];
     activePen: MarkId;
     guesses: Guess[];
+    validTileIds: number[];
     debugPartitions:boolean;
 }
 

@@ -95,7 +95,7 @@ body {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
-    width: min(100%, 500px);
+    width: min(100%, 100vh);
     margin: 24px auto 0;
 }
 

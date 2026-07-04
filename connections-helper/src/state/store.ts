@@ -9,6 +9,7 @@ let state: AppState = {
     tiles: [],
     activePen: 1,
     guesses: [],
+    validTileIds:[],
     debugPartitions: true,
 };
 

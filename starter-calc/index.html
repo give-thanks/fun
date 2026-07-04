@@ -1,114 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Starter Calculator</title>
+  <title>Sourdough Starter Feed Calculator</title>
+
   <style>
+    :root {
+      --bg: #f5f5f5;
+      --card: white;
+      --accent: #2d6cdf;
+      --border: #d8d8d8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, system-ui;
-      padding: 20px;
-      background: #f7f7f7;
+      margin: 0;
+      padding: 16px;
+      background: var(--bg);
+      font-family: system-ui, sans-serif;
+      color: #222;
+    }
+
+    .card {
+      max-width: 460px;
+      margin: auto;
+      background: var(--card);
+      border-radius: 12px;
+      padding: 18px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
     }
 
     h2 {
-      margin-bottom: 10px;
+      margin-top: 0;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-weight: 600;
     }
 
     input {
       width: 100%;
-      font-size: 18px;
+      margin-top: 4px;
       padding: 12px;
-      margin: 6px 0;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-    }
-
-    .result {
-      margin-top: 20px;
       font-size: 18px;
-      background: white;
-      padding: 15px;
-      border-radius: 10px;
-      line-height: 1.5;
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
 
-    .label {
-      font-size: 14px;
+    input:disabled {
+      background: #eee;
+      color: #888;
+    }
+
+    .group {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #ddd;
+    }
+
+    .output {
+      margin-top: 22px;
+      border-top: 2px solid #ddd;
+      padding-top: 16px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      font-size: 18px;
+    }
+
+    .value {
+      font-weight: bold;
+    }
+
+    .small {
       color: #666;
-      margin-top: 10px;
+      font-size: 15px;
     }
   </style>
 </head>
 
 <body>
 
-  <h2>Starter Calculator</h2>
+  <div class="card">
 
-  <div class="label">Current Starter (g)</div>
-  <input id="current" type="number" value="50">
+    <h2>Starter Feed Calculator</h2>
 
-  <div class="label">Per Batch (g)</div>
-  <input id="perBatch" type="number" value="100">
+    <label>
+      Grams per batch
+      <input id="perBatch" type="number" value="100" min="0">
+    </label>
 
-  <div class="label">Number of Batches</div>
-  <input id="batches" type="number" value="1">
+    <label>
+      Batches
+      <input id="batches" type="number" value="1" min="0">
+    </label>
 
-  <div class="label">Leftover (g)</div>
-  <input id="leftover" type="number" value="50">
+    <label>
+      Leftover
+      <input id="leftover" type="number" value="50" min="0">
+    </label>
 
-  <div class="label">Total Override (optional)</div>
-  <input id="override" type="number" placeholder="Leave blank to auto-calc">
+    <label>
+      Override target total (optional)
+      <input id="targetOverride" type="number" min="0">
+    </label>
 
-  <div class="result" id="result"></div>
+    <div class="group">
+
+      <label>
+        Starter amount
+        <input id="starterInput" type="number" min="0">
+      </label>
+
+      <label>
+        Feed ratio (single number, e.g. 2 means 1:2:2)
+        <input id="ratioInput" type="number" step="0.1" min="0">
+      </label>
+
+    </div>
+
+    <div class="output">
+
+      <div class="row">
+        <span>Target Total</span>
+        <span class="value" id="targetTotal">150 g</span>
+      </div>
+
+      <div class="row">
+        <span>Starter</span>
+        <span class="value" id="starterOut">—</span>
+      </div>
+
+      <div class="row">
+        <span>Water</span>
+        <span class="value" id="waterOut">—</span>
+      </div>
+
+      <div class="row">
+        <span>Flour</span>
+        <span class="value" id="flourOut">—</span>
+      </div>
+
+      <div class="row">
+        <span>Total</span>
+        <span class="value" id="totalOut">—</span>
+      </div>
+
+      <div class="row">
+        <span>Ratio</span>
+        <span class="value" id="ratioOut">—</span>
+      </div>
+
+    </div>
+
+  </div>
 
   <script>
-    const inputs = document.querySelectorAll("input");
-    inputs.forEach(i => i.addEventListener("input", calc));
+    const ids = [
+      "perBatch",
+      "batches",
+      "leftover",
+      "targetOverride",
+      "starterInput",
+      "ratioInput"
+    ];
 
-    function format(n) {
-      return Number.isInteger(n) ? n : n.toFixed(2).replace(/\.?0+$/, '');
+    const els = {};
+    ids.forEach(id => els[id] = document.getElementById(id));
+
+    const out = {
+      target: document.getElementById("targetTotal"),
+      starter: document.getElementById("starterOut"),
+      water: document.getElementById("waterOut"),
+      flour: document.getElementById("flourOut"),
+      total: document.getElementById("totalOut"),
+      ratio: document.getElementById("ratioOut")
+    };
+
+    function fmt(n) {
+      return (Math.round(n * 10) / 10).toString().replace(/\.0$/, "");
+    }
+
+    function updateLocks() {
+
+      if (els.starterInput.value !== "") {
+        els.ratioInput.value = "";
+        els.ratioInput.disabled = true;
+      } else {
+        els.ratioInput.disabled = false;
+      }
+
+      if (els.ratioInput.value !== "") {
+        els.starterInput.value = "";
+        els.starterInput.disabled = true;
+      } else {
+        els.starterInput.disabled = false;
+      }
+
     }
 
     function calc() {
-      const current = +document.getElementById('current').value || 0;
-      const perBatch = +document.getElementById('perBatch').value || 0;
-      const batches = +document.getElementById('batches').value || 0;
-      const leftover = +document.getElementById('leftover').value || 0;
-      const override = +document.getElementById('override').value;
 
-      let target = override || (perBatch * batches + leftover);
+      updateLocks();
 
-      if (!current || !target || target <= current) {
-        document.getElementById('result').innerText =
-          "Enter valid numbers (target must be > current)";
+      const perBatch = Number(els.perBatch.value) || 0;
+      const batches = Number(els.batches.value) || 0;
+      const leftover = Number(els.leftover.value) || 0;
+
+      let target =
+        els.targetOverride.value === ""
+          ? perBatch * batches + leftover
+          : Number(els.targetOverride.value);
+
+      out.target.textContent = fmt(target) + " g";
+
+      let starter, flour, water, ratio;
+
+      if (els.starterInput.value !== "") {
+
+        starter = Number(els.starterInput.value);
+
+        if (starter <= 0 || starter >= target) {
+          clearOutputs();
+          return;
+        }
+
+        flour = (target - starter) / 2;
+        water = flour;
+        ratio = flour / starter;
+
+      } else if (els.ratioInput.value !== "") {
+
+        ratio = Number(els.ratioInput.value);
+
+        if (ratio <= 0) {
+          clearOutputs();
+          return;
+        }
+
+        starter = target / (1 + 2 * ratio);
+        flour = starter * ratio;
+        water = flour;
+
+      } else {
+
+        clearOutputs();
         return;
       }
 
-      const toAdd = target - current;
-      const flour = toAdd / 2;
-      const water = toAdd / 2;
+      out.starter.textContent = fmt(starter) + " g";
+      out.flour.textContent = fmt(flour) + " g";
+      out.water.textContent = fmt(water) + " g";
+      out.total.textContent = fmt(starter + flour + water) + " g";
+      out.ratio.textContent = "1:" + fmt(ratio) + ":" + fmt(ratio);
 
-      const flourRatio = flour / current;
-      const waterRatio = water / current;
-
-      const breakdown = `${format(current)} + ${format(flour)} + ${format(water)} = ${format(target)}`;
-
-      document.getElementById('result').innerHTML = `
-      🧮 Target: <b>${format(target)} g</b><br><br>
-  
-      Add:<br>
-      🌾 Flour: <b>${format(flour)} g</b><br>
-      💧 Water: <b>${format(water)} g</b><br><br>
-  
-      ⚖️ Ratio: <b>1 : ${format(flourRatio)} : ${format(waterRatio)}</b><br>
-      (starter : flour : water)<br><br>
-  
-      🧾 Breakdown:<br>
-      ${breakdown}
-    `;
     }
+
+    function clearOutputs() {
+      out.starter.textContent = "—";
+      out.water.textContent = "—";
+      out.flour.textContent = "—";
+      out.total.textContent = "—";
+      out.ratio.textContent = "—";
+    }
+
+    Object.values(els).forEach(el => el.addEventListener("input", calc));
 
     calc();
   </script>
