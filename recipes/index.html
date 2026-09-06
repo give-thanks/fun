@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Recipe Box</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-6">
+    <div class="max-w-4xl mx-auto">
+        <!-- Persistent Toggle Button -->
+        <div class="mb-4">
+            <button id="toggle-btn" onclick="toggleSidebar()"
+                class="bg-white px-4 py-2 rounded-lg shadow text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 border transition">
+                <span id="toggle-icon">◀</span> <span id="toggle-text">Collapse List</span>
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- Sidebar / Recipe List -->
+            <div id="sidebar"
+                class="bg-white p-4 rounded-lg shadow md:col-span-1 flex flex-col h-[75vh] md:h-[calc(100vh-7rem)] transition-all">
+                <h1 class="text-xl font-bold mb-4 text-gray-800">Recipe List</h1>
+                <input type="text" id="search" placeholder="Search by name, ingredient, or author..."
+                    class="w-full p-2 border rounded-lg mb-2 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+
+                <!-- Sleek Segmented Control Toggle -->
+                <div class="bg-gray-100 p-0.5 rounded-lg flex mb-4 text-xs font-medium">
+                    <button id="mode-all" onclick="setSearchMode('all')"
+                        class="flex-1 py-1.5 rounded-md transition bg-white shadow-sm text-gray-900">All Words</button>
+                    <button id="mode-exact" onclick="setSearchMode('exact')"
+                        class="flex-1 py-1.5 rounded-md transition text-gray-500 hover:text-gray-900">Exact
+                        Match</button>
+                </div>
+
+                <ul id="recipe-list" class="overflow-y-auto flex-1 divide-y divide-gray-100">
+                </ul>
+            </div>
+
+            <!-- Recipe Display Panel -->
+            <div id="display-panel"
+                class="bg-white p-6 rounded-lg shadow md:col-span-2 h-[75vh] md:h-[calc(100vh-7rem)] overflow-y-auto transition-all">
+                <div id="recipe-display" class="text-gray-600">
+                    <p class="text-center mt-32 italic">Select a recipe from the list to view it.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let recipes = [];
+        let isSidebarOpen = true;
+        let searchMode = 'all'; // 'all' or 'exact'
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const displayPanel = document.getElementById('display-panel');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const toggleText = document.getElementById('toggle-text');
+
+            isSidebarOpen = !isSidebarOpen;
+
+            if (isSidebarOpen) {
+                sidebar.classList.remove('hidden');
+                displayPanel.classList.remove('md:col-span-3');
+                displayPanel.classList.add('md:col-span-2');
+                toggleIcon.textContent = '◀';
+                toggleText.textContent = 'Collapse List';
+            } else {
+                sidebar.classList.add('hidden');
+                displayPanel.classList.remove('md:col-span-2');
+                displayPanel.classList.add('md:col-span-3');
+                toggleIcon.textContent = '▶';
+                toggleText.textContent = 'Expand List';
+            }
+        }
+
+        function setSearchMode(mode) {
+            searchMode = mode;
+            const btnAll = document.getElementById('mode-all');
+            const btnExact = document.getElementById('mode-exact');
+
+            if (mode === 'all') {
+                btnAll.className = 'flex-1 py-1.5 rounded-md transition bg-white shadow-sm text-gray-900';
+                btnExact.className = 'flex-1 py-1.5 rounded-md transition text-gray-500 hover:text-gray-900';
+            } else {
+                btnExact.className = 'flex-1 py-1.5 rounded-md transition bg-white shadow-sm text-gray-900';
+                btnAll.className = 'flex-1 py-1.5 rounded-md transition text-gray-500 hover:text-gray-900';
+            }
+
+            executeSearch();
+        }
+
+        async function loadRecipes() {
+            try {
+                const response = await fetch('recipes.json');
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                recipes = await response.json();
+                renderList(recipes);
+            } catch (err) {
+                document.getElementById('recipe-list').innerHTML = `<li class="p-3 text-red-500 text-sm">Failed to load recipes.json. Are you running a local server (like Live Server)?<br><br>Error: ${err.message}</li>`;
+            }
+        }
+
+        function renderList(items) {
+            const listEl = document.getElementById('recipe-list');
+            listEl.innerHTML = '';
+
+            items.forEach(recipe => {
+                const li = document.createElement('li');
+                li.className = 'py-2 px-3 hover:bg-blue-50 cursor-pointer rounded text-sm text-gray-700 truncate';
+                li.textContent = recipe.title;
+                li.onclick = () => displayRecipe(recipe);
+                listEl.appendChild(li);
+            });
+        }
+
+        function displayRecipe(recipe) {
+            const displayEl = document.getElementById('recipe-display');
+
+            // Format metadata, filtering out "Serving Size": "0" (or 0)
+            let metadataHtml = '';
+            if (recipe.metadata && Object.keys(recipe.metadata).length > 0) {
+                const metadataItems = Object.entries(recipe.metadata)
+                    .filter(([key, value]) => !(key.toLowerCase() === 'serving size' && String(value).trim() === '0'))
+                    .map(([key, value]) => `<span class="bg-gray-100 px-2.5 py-1 rounded text-xs font-medium text-gray-600"><strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</span>`)
+                    .join('');
+
+                if (metadataItems) {
+                    metadataHtml = `<div class="flex flex-wrap gap-2 mb-6">${metadataItems}</div>`;
+                }
+            }
+
+            // Format ingredients list
+            const ingredientsHtml = recipe.ingredients && recipe.ingredients.length > 0
+                ? `<ul class="list-disc pl-5 mb-6 space-y-1">` +
+                recipe.ingredients.map(ing => `<li>${escapeHtml(ing.filter(Boolean).join(' '))}</li>`).join('') +
+                `</ul>`
+                : '<p class="italic mb-6">No ingredients listed.</p>';
+
+            // Format instructions list
+            const instructionsHtml = recipe.instructions && recipe.instructions.length > 0
+                ? `<ol class="list-decimal pl-5 space-y-2">` +
+                recipe.instructions.map(ins => `<li>${escapeHtml(ins)}</li>`).join('') +
+                `</ol>`
+                : '<p class="italic">No instructions listed.</p>';
+
+            displayEl.innerHTML = `
+        <h2 class="text-2xl font-bold mb-3 text-gray-800 border-b pb-2">${escapeHtml(recipe.title)}</h2>
+        ${metadataHtml}
+        
+        <h3 class="text-lg font-semibold mb-2 text-gray-700">Ingredients</h3>
+        ${ingredientsHtml}
+        
+        <h3 class="text-lg font-semibold mb-2 text-gray-700">Instructions</h3>
+        ${instructionsHtml}
+    `;
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function executeSearch() {
+            const queryStr = document.getElementById('search').value.toLowerCase().trim();
+
+            if (!queryStr) {
+                renderList(recipes);
+                return;
+            }
+
+            const filtered = recipes.filter(r => {
+                const titleStr = r.title ? r.title.toLowerCase() : '';
+                const metadataStr = r.metadata ? Object.entries(r.metadata).map(([k, v]) => `${k} ${v}`).join(' ').toLowerCase() : '';
+                const ingredientsStr = r.ingredients ? r.ingredients.map(ingArray => ingArray.filter(Boolean).join(' ')).join(' ').toLowerCase() : '';
+                const fullRecipeBlob = `${titleStr} ${metadataStr} ${ingredientsStr}`;
+
+                if (searchMode === 'exact') {
+                    return fullRecipeBlob.includes(queryStr);
+                } else {
+                    const terms = [];
+                    const regex = /"([^"]+)"|([^\s]+)/g;
+                    let match;
+                    while ((match = regex.exec(queryStr)) !== null) {
+                        terms.push(match[1] || match[2]);
+                    }
+
+                    if (terms.length === 0) return true;
+
+                    return terms.every(term => {
+                        const matchTitle = titleStr.includes(term);
+                        const matchMetadata = r.metadata && Object.entries(r.metadata).some(([key, value]) =>
+                            key.toLowerCase().includes(term) || String(value).toLowerCase().includes(term)
+                        );
+                        const matchIngredients = r.ingredients && r.ingredients.some(ingArray => {
+                            const fullIngredientString = ingArray.filter(Boolean).join(' ').toLowerCase();
+                            return fullIngredientString.includes(term);
+                        });
+
+                        return matchTitle || matchMetadata || matchIngredients;
+                    });
+                }
+            });
+
+            renderList(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', executeSearch);
+
+        loadRecipes();
+    </script>
+</body>
+
+</html>
