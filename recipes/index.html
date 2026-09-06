@@ -12,29 +12,33 @@
     </script>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen p-6 transition-colors duration-200">
-    <div class="max-w-4xl mx-auto">
+<body class="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 md:p-6 transition-colors duration-200">
+    <div class="max-w-2xl mx-auto">
         <!-- Top Toolbar Controls -->
-        <div class="mb-4 flex items-center justify-between">
-            <button id="toggle-btn" onclick="toggleSidebar()"
-                class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 border border-gray-200 dark:border-gray-700 transition">
-                <span id="toggle-icon">◀</span> <span id="toggle-text">Collapse List</span>
-            </button>
-
+        <div class="mb-4 flex justify-end">
             <button id="theme-btn" onclick="toggleTheme()"
                 class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 border border-gray-200 dark:border-gray-700 transition">
                 <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
             </button>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Main Card Container -->
+        <div
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg h-[calc(100vh-6rem)] flex flex-col overflow-hidden transition-all">
 
-            <!-- Sidebar / Recipe List -->
-            <div id="sidebar"
-                class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow md:col-span-1 flex flex-col h-[75vh] md:h-[calc(100vh-7rem)] transition-all">
-                <h1 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recipe List</h1>
-                <input type="text" id="search" placeholder="Search by name, ingredient, or author..."
-                    class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg mb-2 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+            <!-- Recipe List View -->
+            <div id="list-view" class="flex flex-col h-full p-6">
+                <h1 class="text-2xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recipe List</h1>
+
+                <!-- Search Input with Clear Button -->
+                <div class="relative mb-3">
+                    <input type="text" id="search" placeholder="Search by name, ingredient, or author..."
+                        class="w-full p-2.5 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm" />
+                    <button id="clear-search" onclick="clearSearch()"
+                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hidden text-sm font-bold px-1.5 py-0.5 rounded transition">
+                        ✕
+                    </button>
+                </div>
 
                 <!-- Sleek Segmented Control Toggle -->
                 <div class="bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg flex mb-4 text-xs font-medium">
@@ -46,15 +50,20 @@
                         Match</button>
                 </div>
 
-                <ul id="recipe-list" class="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-gray-700">
+                <ul id="recipe-list" class="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-gray-700 pr-1">
                 </ul>
             </div>
 
-            <!-- Recipe Display Panel -->
-            <div id="display-panel"
-                class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow md:col-span-2 h-[75vh] md:h-[calc(100vh-7rem)] overflow-y-auto transition-all">
-                <div id="recipe-display" class="text-gray-600 dark:text-gray-300">
-                    <p class="text-center mt-32 italic">Select a recipe from the list to view it.</p>
+            <!-- Recipe Detail View -->
+            <div id="detail-view" class="hidden flex flex-col h-full p-6 overflow-y-auto">
+                <div
+                    class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 flex items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
+                    <button onclick="showList()"
+                        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3.5 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-1.5 shadow-sm">
+                        ← Back to List
+                    </button>
+                </div>
+                <div id="recipe-display" class="text-gray-600 dark:text-gray-300 pb-6">
                 </div>
             </div>
 
@@ -63,7 +72,6 @@
 
     <script>
         let recipes = [];
-        let isSidebarOpen = true;
         let searchMode = 'all'; // 'all' or 'exact'
 
         // Initialize theme based on OS preference or localStorage override
@@ -85,6 +93,7 @@
                 localStorage.theme = 'dark';
             }
             updateThemeButton();
+            setSearchMode(searchMode); // Refresh mode button styling
         }
 
         function updateThemeButton() {
@@ -96,27 +105,17 @@
             themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const displayPanel = document.getElementById('display-panel');
-            const toggleIcon = document.getElementById('toggle-icon');
-            const toggleText = document.getElementById('toggle-text');
+        function showList() {
+            document.getElementById('detail-view').classList.add('hidden');
+            document.getElementById('list-view').classList.remove('hidden');
+        }
 
-            isSidebarOpen = !isSidebarOpen;
-
-            if (isSidebarOpen) {
-                sidebar.classList.remove('hidden');
-                displayPanel.classList.remove('md:col-span-3');
-                displayPanel.classList.add('md:col-span-2');
-                toggleIcon.textContent = '◀';
-                toggleText.textContent = 'Collapse List';
-            } else {
-                sidebar.classList.add('hidden');
-                displayPanel.classList.remove('md:col-span-2');
-                displayPanel.classList.add('md:col-span-3');
-                toggleIcon.textContent = '▶';
-                toggleText.textContent = 'Expand List';
-            }
+        function clearSearch() {
+            const searchInput = document.getElementById('search');
+            searchInput.value = '';
+            document.getElementById('clear-search').classList.add('hidden');
+            renderList(recipes);
+            searchInput.focus();
         }
 
         function setSearchMode(mode) {
@@ -153,7 +152,7 @@
 
             items.forEach(recipe => {
                 const li = document.createElement('li');
-                li.className = 'py-2 px-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer rounded text-sm text-gray-700 dark:text-gray-300 truncate';
+                li.className = 'py-3 px-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer rounded text-sm text-gray-700 dark:text-gray-300 truncate transition-colors';
                 li.textContent = recipe.title;
                 li.onclick = () => displayRecipe(recipe);
                 listEl.appendChild(li);
@@ -200,6 +199,11 @@
         <h3 class="text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Instructions</h3>
         ${instructionsHtml}
     `;
+
+            // Switch views
+            document.getElementById('list-view').classList.add('hidden');
+            document.getElementById('detail-view').classList.remove('hidden');
+            document.getElementById('detail-view').scrollTop = 0;
         }
 
         function escapeHtml(str) {
@@ -207,7 +211,15 @@
         }
 
         function executeSearch() {
-            const queryStr = document.getElementById('search').value.toLowerCase().trim();
+            const searchInput = document.getElementById('search');
+            const queryStr = searchInput.value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clear-search');
+
+            if (queryStr.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
 
             if (!queryStr) {
                 renderList(recipes);
