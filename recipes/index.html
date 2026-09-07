@@ -19,7 +19,7 @@
     <div id="app" class="h-full flex flex-col flex-1 items-center"></div>
 
     <script>
-        const VERSION = "1.0.2";
+        const VERSION = "1.0.3";
 
         // Application State
         let state = {
@@ -147,12 +147,12 @@
             } else if (state.selectedRecipeIndex !== null) {
                 const r = state.recipes[state.selectedRecipeIndex];
                 contentHTML = `
-                    <div class="p-3.5 sm:p-5 space-y-3.5">
-                        <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2.5">
+                    <div class="p-3 sm:p-4 space-y-3">
+                        <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-2">
                             <button id="back-btn" class="inline-flex items-center text-xs font-semibold bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-2 py-1 rounded-md transition-colors shrink-0">
                                 ← Back
                             </button>
-                            <h2 class="text-sm sm:text-base font-bold truncate leading-tight">${escapeHTML(r.title)}</h2>
+                            <h2 class="text-xs sm:text-sm font-bold truncate leading-tight">${escapeHTML(r.title)}</h2>
                         </div>
                         
                         ${r.metadata && Object.keys(r.metadata).length > 0 ? `
@@ -165,9 +165,9 @@
                             </div>
                         ` : ''}
 
-                        <div class="space-y-1.5">
-                            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ingredients</h3>
-                            <ul class="list-disc list-inside space-y-1 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                        <div class="space-y-1">
+                            <h3 class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ingredients</h3>
+                            <ul class="list-disc list-inside space-y-0.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                                 ${r.ingredients ? r.ingredients.map(row => `
                                     <li>
                                         <span class="font-medium">${escapeHTML(row[0] || '')}</span> 
@@ -180,9 +180,9 @@
                             </ul>
                         </div>
 
-                        <div class="space-y-1.5 pt-1">
-                            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Instructions</h3>
-                            <ol class="list-decimal list-inside space-y-1.5 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
+                        <div class="space-y-1 pt-1">
+                            <h3 class="text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Instructions</h3>
+                            <ol class="list-decimal list-inside space-y-1 text-xs sm:text-sm text-gray-700 dark:text-gray-300">
                                 ${r.instructions ? r.instructions.map(step => `
                                     <li class="pl-0.5 leading-relaxed">
                                         <span class="text-gray-900 dark:text-gray-100">${escapeHTML(step)}</span>
@@ -195,60 +195,59 @@
             } else {
                 const filtered = getFilteredRecipes();
                 contentHTML = `
-                    <div class="flex flex-col flex-1 p-3.5 space-y-3 w-full">
-                        <div class="space-y-1.5">
-                            <div class="relative flex items-center">
+                    <div class="flex flex-col flex-1 p-3 space-y-2.5 w-full">
+                        <div class="flex items-center gap-1.5">
+                            <div class="relative flex-1 flex items-center">
                                 <input
                                     id="search-input"
                                     type="text"
                                     value="${escapeHTML(state.searchQuery)}"
-                                    placeholder="Search recipes, ingredients, metadata..."
-                                    class="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 dark:focus:border-blue-400 rounded-xl px-3.5 py-2 pr-9 text-xs sm:text-sm focus:outline-none transition-colors"
+                                    placeholder="Search recipes, ingredients..."
+                                    class="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 dark:focus:border-blue-400 rounded-lg px-3 py-1.5 pr-8 text-xs focus:outline-none transition-colors"
                                 />
                                 ${state.searchQuery ? `
                                     <button
                                         id="clear-search-btn"
-                                        class="absolute right-2.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs font-bold px-1 py-0.5 rounded-full"
+                                        class="absolute right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xs font-bold px-1 py-0.5 rounded-full"
                                         title="Clear search"
                                     >
                                         ✕
                                     </button>
                                 ` : ''}
                             </div>
-
-                            <div class="flex items-center justify-between text-[11px] sm:text-xs text-gray-500 dark:text-gray-400 px-0.5">
-                                <span>Search mode:</span>
-                                <div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5">
-                                    <button
-                                        data-mode="all"
-                                        class="mode-btn px-2.5 py-0.5 rounded-md font-medium transition-all ${state.searchMode === 'all' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs' : 'hover:text-gray-900 dark:hover:text-gray-100'}"
-                                    >
-                                        All Words
-                                    </button>
-                                    <button
-                                        data-mode="exact"
-                                        class="mode-btn px-2.5 py-0.5 rounded-md font-medium transition-all ${state.searchMode === 'exact' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs' : 'hover:text-gray-900 dark:hover:text-gray-100'}"
-                                    >
-                                        Exact Match
-                                    </button>
-                                </div>
+                            
+                            <div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5 shrink-0">
+                                <button
+                                    data-mode="all"
+                                    class="mode-btn px-2 py-1 rounded-md text-[11px] font-medium transition-all ${state.searchMode === 'all' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+                                    title="All Words mode"
+                                >
+                                    All
+                                </button>
+                                <button
+                                    data-mode="exact"
+                                    class="mode-btn px-2 py-1 rounded-md text-[11px] font-medium transition-all ${state.searchMode === 'exact' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs' : 'text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'}"
+                                    title="Exact Match mode"
+                                >
+                                    Exact
+                                </button>
                             </div>
                         </div>
 
-                        <div class="flex-1 space-y-2">
+                        <div class="flex-1 space-y-1.5">
                             ${filtered.length === 0 ? `
-                                <div class="text-center py-10 text-gray-400 dark:text-gray-500 text-xs sm:text-sm">
+                                <div class="text-center py-10 text-gray-400 dark:text-gray-500 text-xs">
                                     No recipes found matching your query.
                                 </div>
                             ` : filtered.map(({ recipe, index }) => `
                                 <div
                                     data-recipe-index="${index}"
-                                    class="recipe-card p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all shadow-xs"
+                                    class="recipe-card px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all shadow-xs flex items-baseline justify-between gap-2"
                                 >
-                                    <h3 class="font-semibold text-xs sm:text-sm mb-0.5">${escapeHTML(recipe.title)}</h3>
+                                    <h3 class="font-medium text-xs sm:text-sm truncate">${escapeHTML(recipe.title)}</h3>
                                     ${recipe.metadata && Object.keys(recipe.metadata).length > 0 ? `
-                                        <div class="flex flex-wrap gap-2 text-[11px] sm:text-xs text-gray-500 dark:text-gray-400">
-                                            ${Object.entries(recipe.metadata).slice(0, 2).map(([k, v]) => `
+                                        <div class="flex gap-2 text-[10px] text-gray-400 dark:text-gray-500 shrink-0">
+                                            ${Object.entries(recipe.metadata).slice(0, 1).map(([k, v]) => `
                                                 <span><strong class="capitalize">${escapeHTML(k)}:</strong> ${escapeHTML(v)}</span>
                                             `).join('')}
                                         </div>
@@ -262,9 +261,9 @@
 
             app.innerHTML = `
                 <div class="w-full max-w-2xl flex flex-col flex-1 bg-white dark:bg-gray-900 shadow-sm border-x border-gray-200 dark:border-gray-800">
-                    <header class="px-3.5 py-2.5 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 sticky top-0 z-10">
-                        <h1 class="text-xs sm:text-sm font-bold tracking-tight">Recipe Book</h1>
-                        <span class="text-[10px] sm:text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">
+                    <header class="px-3.5 py-2 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 sticky top-0 z-10">
+                        <h1 class="text-xs font-bold tracking-tight">Recipe Book</h1>
+                        <span class="text-[10px] font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-1.5 py-0.2 rounded">
                             v${VERSION}
                         </span>
                     </header>
