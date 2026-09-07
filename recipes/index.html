@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Recipe Box</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,10 +13,10 @@
     </script>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 min-h-screen p-4 md:p-6 transition-colors duration-200 text-lg">
-    <div class="max-w-2xl mx-auto">
+<body class="bg-gray-100 dark:bg-gray-900 min-h-[100dvh] p-2 md:p-6 transition-colors duration-200 text-lg">
+    <div class="max-w-2xl mx-auto h-full flex flex-col">
         <!-- Top Toolbar Controls -->
-        <div class="mb-4 flex justify-end">
+        <div class="mb-3 flex justify-end shrink-0">
             <button id="theme-btn" onclick="toggleTheme()"
                 class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 border border-gray-200 dark:border-gray-700 transition">
                 <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
@@ -24,14 +25,15 @@
 
         <!-- Main Card Container -->
         <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg h-[calc(100vh-6rem)] flex flex-col overflow-hidden transition-all">
+            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg h-[calc(100dvh-5rem)] md:h-[calc(100vh-6rem)] flex flex-col overflow-hidden transition-all">
 
             <!-- Recipe List View -->
-            <div id="list-view" class="flex flex-col h-full p-6">
-                <h1 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100">Recipe List</h1>
+            <div id="list-view" class="flex flex-col h-full p-4 md:p-6 overflow-hidden">
+                <h1 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100 shrink-0">Recipe List
+                </h1>
 
                 <!-- Search Input with Clear Button -->
-                <div class="relative mb-3">
+                <div class="relative mb-3 shrink-0">
                     <input type="text" id="search" placeholder="Search by name, ingredient, or author..."
                         class="w-full p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-[16px]" />
                     <button id="clear-search" onclick="clearSearch()"
@@ -41,7 +43,8 @@
                 </div>
 
                 <!-- Sleek Segmented Control Toggle -->
-                <div class="bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg flex mb-4 text-xs md:text-sm font-medium">
+                <div
+                    class="bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg flex mb-4 text-xs md:text-sm font-medium shrink-0">
                     <button id="mode-all" onclick="setSearchMode('all')"
                         class="flex-1 py-1.5 rounded-md transition bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white">All
                         Words</button>
@@ -55,7 +58,7 @@
             </div>
 
             <!-- Recipe Detail View -->
-            <div id="detail-view" class="hidden flex flex-col h-full p-6 overflow-y-auto">
+            <div id="detail-view" class="hidden flex flex-col h-full p-4 md:p-6 overflow-y-auto">
                 <div
                     class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 flex items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
                     <button onclick="showList()"
@@ -63,7 +66,7 @@
                         ← Back to List
                     </button>
                 </div>
-                <div id="recipe-display" class="text-gray-600 dark:text-gray-300 pb-6">
+                <div id="recipe-display" class="text-gray-600 dark:text-gray-300 pb-6 text-lg md:text-xl">
                 </div>
             </div>
 
@@ -262,7 +265,15 @@
             renderList(filtered);
         }
 
-        document.getElementById('search').addEventListener('input', executeSearch);
+        const searchInput = document.getElementById('search');
+        searchInput.addEventListener('input', executeSearch);
+
+        // Dismiss mobile keyboard on Enter key press
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                searchInput.blur();
+            }
+        });
 
         // Initialize theme on load
         initTheme();
