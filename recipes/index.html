@@ -17,7 +17,9 @@
     class="bg-gray-100 dark:bg-gray-900 min-h-[100dvh] p-2 md:p-6 transition-colors duration-200 text-base md:text-lg">
     <div class="max-w-2xl mx-auto h-full flex flex-col">
         <!-- Top Toolbar Controls -->
-        <div class="mb-3 flex justify-end shrink-0">
+        <div class="mb-3 flex justify-between items-center shrink-0">
+            <span
+                class="text-xs font-semibold px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">v1.0</span>
             <button id="theme-btn" onclick="toggleTheme()"
                 class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 border border-gray-200 dark:border-gray-700 transition">
                 <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
@@ -255,7 +257,7 @@
                         );
                         const matchIngredients = r.ingredients && r.ingredients.some(ingArray => {
                             const fullIngredientString = ingArray.filter(Boolean).join(' ').toLowerCase();
-                            return fullIngredientString.includes(term);
+                            return fullIngredientString.includes(testTerm => fullIngredientString.includes(term)); // simplified
                         });
 
                         return matchTitle || matchMetadata || matchIngredients;
