@@ -13,7 +13,8 @@
     </script>
 </head>
 
-<body class="bg-gray-100 dark:bg-gray-900 min-h-[100dvh] p-2 md:p-6 transition-colors duration-200 text-lg">
+<body
+    class="bg-gray-100 dark:bg-gray-900 min-h-[100dvh] p-2 md:p-6 transition-colors duration-200 text-base md:text-lg">
     <div class="max-w-2xl mx-auto h-full flex flex-col">
         <!-- Top Toolbar Controls -->
         <div class="mb-3 flex justify-end shrink-0">
@@ -29,13 +30,13 @@
 
             <!-- Recipe List View -->
             <div id="list-view" class="flex flex-col h-full p-4 md:p-6 overflow-hidden">
-                <h1 class="text-2xl md:text-3xl font-bold mb-4 text-gray-800 dark:text-gray-100 shrink-0">Recipe List
+                <h1 class="text-2xl md:text-3xl font-bold mb-3 text-gray-800 dark:text-gray-100 shrink-0">Recipe List
                 </h1>
 
                 <!-- Search Input with Clear Button -->
                 <div class="relative mb-3 shrink-0">
                     <input type="text" id="search" placeholder="Search by name, ingredient, or author..."
-                        class="w-full p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-[16px]" />
+                        class="w-full p-2.5 md:p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-[16px]" />
                     <button id="clear-search" onclick="clearSearch()"
                         class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hidden text-sm font-bold px-1.5 py-0.5 rounded transition">
                         ✕
@@ -44,7 +45,7 @@
 
                 <!-- Sleek Segmented Control Toggle -->
                 <div
-                    class="bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg flex mb-4 text-xs md:text-sm font-medium shrink-0">
+                    class="bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg flex mb-3 text-xs md:text-sm font-medium shrink-0">
                     <button id="mode-all" onclick="setSearchMode('all')"
                         class="flex-1 py-1.5 rounded-md transition bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white">All
                         Words</button>
@@ -66,7 +67,7 @@
                         ← Back to List
                     </button>
                 </div>
-                <div id="recipe-display" class="text-gray-600 dark:text-gray-300 pb-6 text-lg md:text-xl">
+                <div id="recipe-display" class="text-gray-600 dark:text-gray-300 pb-6 text-base md:text-lg">
                 </div>
             </div>
 
@@ -155,7 +156,7 @@
 
             items.forEach(recipe => {
                 const li = document.createElement('li');
-                li.className = 'py-3.5 px-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer rounded text-base md:text-lg text-gray-700 dark:text-gray-300 truncate transition-colors';
+                li.className = 'py-2.5 px-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer rounded text-sm md:text-base text-gray-700 dark:text-gray-300 truncate transition-colors';
                 li.textContent = recipe.title;
                 li.onclick = () => displayRecipe(recipe);
                 listEl.appendChild(li);
@@ -170,36 +171,36 @@
             if (recipe.metadata && Object.keys(recipe.metadata).length > 0) {
                 const metadataItems = Object.entries(recipe.metadata)
                     .filter(([key, value]) => !(key.toLowerCase() === 'serving size' && String(value).trim() === '0'))
-                    .map(([key, value]) => `<span class="bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded text-sm md:text-base font-medium text-gray-600 dark:text-gray-300"><strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</span>`)
+                    .map(([key, value]) => `<span class="bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300"><strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</span>`)
                     .join('');
 
                 if (metadataItems) {
-                    metadataHtml = `<div class="flex flex-wrap gap-2 mb-6">${metadataItems}</div>`;
+                    metadataHtml = `<div class="flex flex-wrap gap-2 mb-4">${metadataItems}</div>`;
                 }
             }
 
             // Format ingredients list
             const ingredientsHtml = recipe.ingredients && recipe.ingredients.length > 0
-                ? `<ul class="list-disc pl-5 mb-6 space-y-2 text-base md:text-lg">` +
+                ? `<ul class="list-disc pl-5 mb-5 space-y-1.5 text-base md:text-lg">` +
                 recipe.ingredients.map(ing => `<li>${escapeHtml(ing.filter(Boolean).join(' '))}</li>`).join('') +
                 `</ul>`
-                : '<p class="italic mb-6 text-base md:text-lg">No ingredients listed.</p>';
+                : '<p class="italic mb-5 text-base md:text-lg">No ingredients listed.</p>';
 
             // Format instructions list
             const instructionsHtml = recipe.instructions && recipe.instructions.length > 0
-                ? `<ol class="list-decimal pl-5 space-y-3 text-base md:text-lg">` +
+                ? `<ol class="list-decimal pl-5 space-y-2.5 text-base md:text-lg">` +
                 recipe.instructions.map(ins => `<li>${escapeHtml(ins)}</li>`).join('') +
                 `</ol>`
                 : '<p class="italic text-base md:text-lg">No instructions listed.</p>';
 
             displayEl.innerHTML = `
-        <h2 class="text-2xl md:text-3xl font-bold mb-3 text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2">${escapeHtml(recipe.title)}</h2>
+        <h2 class="text-xl md:text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2">${escapeHtml(recipe.title)}</h2>
         ${metadataHtml}
         
-        <h3 class="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-200">Ingredients</h3>
+        <h3 class="text-base md:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Ingredients</h3>
         ${ingredientsHtml}
         
-        <h3 class="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-200">Instructions</h3>
+        <h3 class="text-base md:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Instructions</h3>
         ${instructionsHtml}
     `;
 
