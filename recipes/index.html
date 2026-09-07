@@ -1,285 +1,347 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Recipe Box</title>
+    <title>Recipe Book</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
+            darkMode: 'media',
         }
     </script>
 </head>
 
-<body
-    class="bg-gray-100 dark:bg-gray-900 min-h-[100dvh] p-2 md:p-6 transition-colors duration-200 text-base md:text-lg">
-    <div class="max-w-2xl mx-auto h-full flex flex-col">
-        <!-- Top Toolbar Controls -->
-        <div class="mb-3 flex justify-between items-center shrink-0">
-            <span
-                class="text-xs font-semibold px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">v1.0</span>
-            <button id="theme-btn" onclick="toggleTheme()"
-                class="bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 border border-gray-200 dark:border-gray-700 transition">
-                <span id="theme-icon">🌙</span> <span id="theme-text">Dark Mode</span>
-            </button>
-        </div>
+<body class="h-full bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 antialiased flex flex-col">
 
-        <!-- Main Card Container -->
-        <div
-            class="bg-white dark:bg-gray-800 rounded-xl shadow-lg h-[calc(100dvh-5rem)] md:h-[calc(100vh-6rem)] flex flex-col overflow-hidden transition-all">
-
-            <!-- Recipe List View -->
-            <div id="list-view" class="flex flex-col h-full p-4 md:p-6 overflow-hidden">
-                <h1 class="text-2xl md:text-3xl font-bold mb-3 text-gray-800 dark:text-gray-100 shrink-0">Recipe List
-                </h1>
-
-                <!-- Search Input with Clear Button -->
-                <div class="relative mb-3 shrink-0">
-                    <input type="text" id="search" placeholder="Search by name, ingredient, or author..."
-                        class="w-full p-2.5 md:p-3 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 text-[16px]" />
-                    <button id="clear-search" onclick="clearSearch()"
-                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hidden text-sm font-bold px-1.5 py-0.5 rounded transition">
-                        ✕
-                    </button>
-                </div>
-
-                <!-- Sleek Segmented Control Toggle -->
-                <div
-                    class="bg-gray-100 dark:bg-gray-700 p-0.5 rounded-lg flex mb-3 text-xs md:text-sm font-medium shrink-0">
-                    <button id="mode-all" onclick="setSearchMode('all')"
-                        class="flex-1 py-1.5 rounded-md transition bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-white">All
-                        Words</button>
-                    <button id="mode-exact" onclick="setSearchMode('exact')"
-                        class="flex-1 py-1.5 rounded-md transition text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">Exact
-                        Match</button>
-                </div>
-
-                <ul id="recipe-list" class="overflow-y-auto flex-1 divide-y divide-gray-100 dark:divide-gray-700 pr-1">
-                </ul>
-            </div>
-
-            <!-- Recipe Detail View -->
-            <div id="detail-view" class="hidden flex flex-col h-full p-4 md:p-6 overflow-y-auto">
-                <div
-                    class="mb-4 pb-4 border-b border-gray-200 dark:border-gray-700 flex items-center sticky top-0 bg-white dark:bg-gray-800 z-10">
-                    <button onclick="showList()"
-                        class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3.5 py-2 rounded-lg text-sm md:text-base font-medium hover:bg-gray-200 dark:hover:bg-gray-600 transition flex items-center gap-1.5 shadow-sm">
-                        ← Back to List
-                    </button>
-                </div>
-                <div id="recipe-display" class="text-gray-600 dark:text-gray-300 pb-6 text-base md:text-lg">
-                </div>
-            </div>
-
-        </div>
-    </div>
+    <div id="app" class="h-full flex flex-col flex-1 items-center"></div>
 
     <script>
-        let recipes = [];
-        let searchMode = 'all'; // 'all' or 'exact'
+        const VERSION = "1.0.1";
 
-        // Initialize theme based on OS preference or localStorage override
-        function initTheme() {
-            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                document.documentElement.classList.add('dark');
-            } else {
-                document.documentElement.classList.remove('dark');
-            }
-            updateThemeButton();
-        }
-
-        function toggleTheme() {
-            if (document.documentElement.classList.contains('dark')) {
-                document.documentElement.classList.remove('dark');
-                localStorage.theme = 'light';
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.theme = 'dark';
-            }
-            updateThemeButton();
-            setSearchMode(searchMode); // Refresh mode button styling
-        }
-
-        function updateThemeButton() {
-            const isDark = document.documentElement.classList.contains('dark');
-            const themeIcon = document.getElementById('theme-icon');
-            const themeText = document.getElementById('theme-text');
-
-            themeIcon.textContent = isDark ? '☀️' : '🌙';
-            themeText.textContent = isDark ? 'Light Mode' : 'Dark Mode';
-        }
-
-        function showList() {
-            document.getElementById('detail-view').classList.add('hidden');
-            document.getElementById('list-view').classList.remove('hidden');
-        }
-
-        function clearSearch() {
-            const searchInput = document.getElementById('search');
-            searchInput.value = '';
-            document.getElementById('clear-search').classList.add('hidden');
-            renderList(recipes);
-            searchInput.focus();
-        }
-
-        function setSearchMode(mode) {
-            searchMode = mode;
-            const btnAll = document.getElementById('mode-all');
-            const btnExact = document.getElementById('mode-exact');
-            const isDark = document.documentElement.classList.contains('dark');
-
-            if (mode === 'all') {
-                btnAll.className = `flex-1 py-1.5 rounded-md transition shadow-sm ${isDark ? 'bg-gray-600 text-white' : 'bg-white text-gray-900'}`;
-                btnExact.className = 'flex-1 py-1.5 rounded-md transition text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white';
-            } else {
-                btnExact.className = `flex-1 py-1.5 rounded-md transition shadow-sm ${isDark ? 'bg-gray-600 text-white' : 'bg-white text-gray-900'}`;
-                btnAll.className = 'flex-1 py-1.5 rounded-md transition text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white';
-            }
-
-            executeSearch();
-        }
+        // Application State
+        let state = {
+            recipes: [],
+            loaded: false,
+            error: null,
+            selectedRecipeIndex: null,
+            searchQuery: "",
+            searchMode: "all" // 'all' or 'exact'
+        };
 
         async function loadRecipes() {
             try {
                 const response = await fetch('recipes.json');
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                recipes = await response.json();
-                renderList(recipes);
-            } catch (err) {
-                document.getElementById('recipe-list').innerHTML = `<li class="p-3 text-red-500 text-base">Failed to load recipes.json. Are you running a local server (like Live Server)?<br><br>Error: ${err.message}</li>`;
-            }
-        }
-
-        function renderList(items) {
-            const listEl = document.getElementById('recipe-list');
-            listEl.innerHTML = '';
-
-            items.forEach(recipe => {
-                const li = document.createElement('li');
-                li.className = 'py-2.5 px-3 hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer rounded text-sm md:text-base text-gray-700 dark:text-gray-300 truncate transition-colors';
-                li.textContent = recipe.title;
-                li.onclick = () => displayRecipe(recipe);
-                listEl.appendChild(li);
-            });
-        }
-
-        function displayRecipe(recipe) {
-            const displayEl = document.getElementById('recipe-display');
-
-            // Format metadata, filtering out "Serving Size": "0" (or 0)
-            let metadataHtml = '';
-            if (recipe.metadata && Object.keys(recipe.metadata).length > 0) {
-                const metadataItems = Object.entries(recipe.metadata)
-                    .filter(([key, value]) => !(key.toLowerCase() === 'serving size' && String(value).trim() === '0'))
-                    .map(([key, value]) => `<span class="bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded text-xs md:text-sm font-medium text-gray-600 dark:text-gray-300"><strong>${escapeHtml(key)}:</strong> ${escapeHtml(value)}</span>`)
-                    .join('');
-
-                if (metadataItems) {
-                    metadataHtml = `<div class="flex flex-wrap gap-2 mb-4">${metadataItems}</div>`;
+                if (!response.ok) {
+                    throw new Error(`Failed to load recipes.json (Status: ${response.status})`);
                 }
+                const data = await response.json();
+                if (!Array.isArray(data)) {
+                    throw new Error("Invalid format: recipes.json must contain an array of recipes.");
+                }
+                state.recipes = data;
+                state.loaded = true;
+            } catch (err) {
+                state.error = err.message;
+                state.loaded = true;
             }
-
-            // Format ingredients list
-            const ingredientsHtml = recipe.ingredients && recipe.ingredients.length > 0
-                ? `<ul class="list-disc pl-5 mb-5 space-y-1.5 text-base md:text-lg">` +
-                recipe.ingredients.map(ing => `<li>${escapeHtml(ing.filter(Boolean).join(' '))}</li>`).join('') +
-                `</ul>`
-                : '<p class="italic mb-5 text-base md:text-lg">No ingredients listed.</p>';
-
-            // Format instructions list
-            const instructionsHtml = recipe.instructions && recipe.instructions.length > 0
-                ? `<ol class="list-decimal pl-5 space-y-2.5 text-base md:text-lg">` +
-                recipe.instructions.map(ins => `<li>${escapeHtml(ins)}</li>`).join('') +
-                `</ol>`
-                : '<p class="italic text-base md:text-lg">No instructions listed.</p>';
-
-            displayEl.innerHTML = `
-        <h2 class="text-xl md:text-2xl font-bold mb-3 text-gray-800 dark:text-gray-100 border-b dark:border-gray-700 pb-2">${escapeHtml(recipe.title)}</h2>
-        ${metadataHtml}
-        
-        <h3 class="text-base md:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Ingredients</h3>
-        ${ingredientsHtml}
-        
-        <h3 class="text-base md:text-lg font-semibold mb-2 text-gray-700 dark:text-gray-200">Instructions</h3>
-        ${instructionsHtml}
-    `;
-
-            // Switch views
-            document.getElementById('list-view').classList.add('hidden');
-            document.getElementById('detail-view').classList.remove('hidden');
-            document.getElementById('detail-view').scrollTop = 0;
+            render();
         }
 
-        function escapeHtml(str) {
-            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                try {
+                    const data = JSON.parse(event.target.result);
+                    if (!Array.isArray(data)) {
+                        throw new Error("Invalid format: JSON file must contain an array.");
+                    }
+                    state.recipes = data;
+                    state.error = null;
+                    state.loaded = true;
+                    render();
+                } catch (err) {
+                    alert("Error parsing JSON: " + err.message);
+                }
+            };
+            reader.readAsText(file);
         }
 
-        function executeSearch() {
-            const searchInput = document.getElementById('search');
-            const queryStr = searchInput.value.toLowerCase().trim();
-            const clearBtn = document.getElementById('clear-search');
+        function parseSearchQuery(query) {
+            const regex = /"([^"]+)"|([^\s"]+)/g;
+            const terms = [];
+            let match;
+            while ((match = regex.exec(query)) !== null) {
+                terms.push((match[1] || match[2]).toLowerCase());
+            }
+            return terms;
+        }
 
-            if (queryStr.length > 0) {
-                clearBtn.classList.remove('hidden');
+        function getFilteredRecipes() {
+            const query = state.searchQuery.trim();
+            if (!query) return state.recipes.map((recipe, index) => ({ recipe, index }));
+
+            if (state.searchMode === 'exact') {
+                const queryLower = query.toLowerCase();
+                return state.recipes.map((recipe, index) => ({ recipe, index })).filter(({ recipe }) => {
+                    const inTitle = recipe.title.toLowerCase().includes(queryLower);
+                    const inMeta = recipe.metadata && Object.entries(recipe.metadata).some(([k, v]) =>
+                        k.toLowerCase().includes(queryLower) || v.toLowerCase().includes(queryLower)
+                    );
+                    const inIngredients = recipe.ingredients && recipe.ingredients.some(row =>
+                        row.some(cell => cell && cell.toLowerCase().includes(queryLower))
+                    );
+                    return inTitle || inMeta || inIngredients;
+                });
             } else {
-                clearBtn.classList.add('hidden');
-            }
+                const terms = parseSearchQuery(query);
+                if (terms.length === 0) return state.recipes.map((recipe, index) => ({ recipe, index }));
 
-            if (!queryStr) {
-                renderList(recipes);
+                return state.recipes.map((recipe, index) => ({ recipe, index })).filter(({ recipe }) => {
+                    const titleText = recipe.title.toLowerCase();
+                    const metaText = recipe.metadata ? Object.entries(recipe.metadata).map(([k, v]) => `${k} ${v}`).join(" ").toLowerCase() : "";
+                    const ingredientText = recipe.ingredients ? recipe.ingredients.flat().filter(Boolean).join(" ").toLowerCase() : "";
+                    const fullText = `${titleText} ${metaText} ${ingredientText}`;
+
+                    return terms.every(term => fullText.includes(term));
+                });
+            }
+        }
+
+        function render() {
+            const app = document.getElementById('app');
+
+            if (!state.loaded) {
+                app.innerHTML = `
+                    <div class="w-full max-w-2xl flex flex-col flex-1 bg-white dark:bg-gray-900 shadow-sm border-x border-gray-200 dark:border-gray-800 items-center justify-center p-6 text-center">
+                        <div class="space-y-2">
+                            <h2 class="text-xl font-bold">Loading recipes...</h2>
+                            <p class="text-sm text-gray-500">Attempting to load recipes.json</p>
+                        </div>
+                    </div>
+                `;
                 return;
             }
 
-            const filtered = recipes.filter(r => {
-                const titleStr = r.title ? r.title.toLowerCase() : '';
-                const metadataStr = r.metadata ? Object.entries(r.metadata).map(([k, v]) => `${k} ${v}`).join(' ').toLowerCase() : '';
-                const ingredientsStr = r.ingredients ? r.ingredients.map(ingArray => ingArray.filter(Boolean).join(' ')).join(' ').toLowerCase() : '';
-                const fullRecipeBlob = `${titleStr} ${metadataStr} ${ingredientsStr}`;
+            let contentHTML = '';
 
-                if (searchMode === 'exact') {
-                    return fullRecipeBlob.includes(queryStr);
-                } else {
-                    const terms = [];
-                    const regex = /"([^"]+)"|([^\s]+)/g;
-                    let match;
-                    while ((match = regex.exec(queryStr)) !== null) {
-                        terms.push(match[1] || match[2]);
-                    }
+            if (state.error) {
+                contentHTML = `
+                    <div class="flex flex-col flex-1 p-6 items-center justify-center text-center space-y-4">
+                        <div class="p-4 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-200 text-sm max-w-md">
+                            <p class="font-semibold mb-1">Could not load <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">recipes.json</code> automatically.</p>
+                            <p class="text-xs opacity-80 mb-3">${escapeHTML(state.error)}</p>
+                            <p class="text-xs">If you are opening this file directly from your computer, browsers block automatic file loading due to security restrictions. Please select your <code class="bg-amber-100 dark:bg-amber-900 px-1 rounded">recipes.json</code> file below:</p>
+                        </div>
+                        <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm px-4 py-2.5 rounded-xl shadow-xs transition-colors">
+                            <span>Browse recipes.json</span>
+                            <input type="file" id="file-input" accept=".json" class="hidden" />
+                        </label>
+                    </div>
+                `;
+            } else if (state.selectedRecipeIndex !== null) {
+                const r = state.recipes[state.selectedRecipeIndex];
+                contentHTML = `
+                    <div class="p-4 space-y-4">
+                        <!-- Compact Header Row with Back Button and Title -->
+                        <div class="flex items-center gap-2 border-b border-gray-200 dark:border-gray-800 pb-3">
+                            <button id="back-btn" class="inline-flex items-center text-xs font-semibold bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 px-2.5 py-1.5 rounded-lg transition-colors shrink-0">
+                                ← Back
+                            </button>
+                            <h2 class="text-lg sm:text-xl font-bold truncate leading-tight">${escapeHTML(r.title)}</h2>
+                        </div>
+                        
+                        ${r.metadata && Object.keys(r.metadata).length > 0 ? `
+                            <div class="flex flex-wrap gap-1.5">
+                                ${Object.entries(r.metadata).map(([k, v]) => `
+                                    <div class="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-md">
+                                        <span class="font-semibold text-gray-600 dark:text-gray-400 capitalize">${escapeHTML(k)}:</span> ${escapeHTML(v)}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : ''}
 
-                    if (terms.length === 0) return true;
+                        <div class="space-y-2">
+                            <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Ingredients</h3>
+                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                                ${r.ingredients ? r.ingredients.map(row => `
+                                    <li>
+                                        <span class="font-medium">${escapeHTML(row[0] || '')}</span> 
+                                        ${escapeHTML(row[1] || '')} 
+                                        ${escapeHTML(row[2] || '')} 
+                                        ${row[3] ? `(${escapeHTML(row[3])})` : ''}
+                                        ${row.slice(4).length > 0 ? escapeHTML(' ' + row.slice(4).join(' ')) : ''}
+                                    </li>
+                                `).join('') : ''}
+                            </ul>
+                        </div>
 
-                    return terms.every(term => {
-                        const matchTitle = titleStr.includes(term);
-                        const matchMetadata = r.metadata && Object.entries(r.metadata).some(([key, value]) =>
-                            key.toLowerCase().includes(term) || String(value).toLowerCase().includes(term)
-                        );
-                        const matchIngredients = r.ingredients && r.ingredients.some(ingArray => {
-                            const fullIngredientString = ingArray.filter(Boolean).join(' ').toLowerCase();
-                            return fullIngredientString.includes(testTerm => fullIngredientString.includes(term)); // simplified
-                        });
+                        <div class="space-y-2 pt-2">
+                            <h3 class="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">Instructions</h3>
+                            <ol class="list-decimal list-inside space-y-2 text-sm text-gray-700 dark:text-gray-300">
+                                ${r.instructions ? r.instructions.map(step => `
+                                    <li class="pl-1 leading-relaxed">
+                                        <span class="text-gray-900 dark:text-gray-100">${escapeHTML(step)}</span>
+                                    </li>
+                                `).join('') : ''}
+                            </ol>
+                        </div>
+                    </div>
+                `;
+            } else {
+                const filtered = getFilteredRecipes();
+                contentHTML = `
+                    <div class="flex flex-col flex-1 p-4 space-y-3 w-full">
+                        <div class="space-y-2">
+                            <div class="relative flex items-center">
+                                <input
+                                    id="search-input"
+                                    type="text"
+                                    value="${escapeHTML(state.searchQuery)}"
+                                    placeholder="Search recipes, ingredients, metadata..."
+                                    class="w-full bg-gray-100 dark:bg-gray-800 border border-transparent focus:border-blue-500 dark:focus:border-blue-400 rounded-xl px-4 py-2.5 pr-10 text-sm focus:outline-none transition-colors"
+                                />
+                                ${state.searchQuery ? `
+                                    <button
+                                        id="clear-search-btn"
+                                        class="absolute right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-sm font-bold px-1.5 py-0.5 rounded-full"
+                                        title="Clear search"
+                                    >
+                                        ✕
+                                    </button>
+                                ` : ''}
+                            </div>
 
-                        return matchTitle || matchMetadata || matchIngredients;
-                    });
-                }
-            });
+                            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                                <span>Search mode:</span>
+                                <div class="inline-flex rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5">
+                                    <button
+                                        data-mode="all"
+                                        class="mode-btn px-3 py-1 rounded-md font-medium transition-all ${state.searchMode === 'all' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs' : 'hover:text-gray-900 dark:hover:text-gray-100'}"
+                                    >
+                                        All Words
+                                    </button>
+                                    <button
+                                        data-mode="exact"
+                                        class="mode-btn px-3 py-1 rounded-md font-medium transition-all ${state.searchMode === 'exact' ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-xs' : 'hover:text-gray-900 dark:hover:text-gray-100'}"
+                                    >
+                                        Exact Match
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
-            renderList(filtered);
+                        <div class="flex-1 space-y-2">
+                            ${filtered.length === 0 ? `
+                                <div class="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">
+                                    No recipes found matching your query.
+                                </div>
+                            ` : filtered.map(({ recipe, index }) => `
+                                <div
+                                    data-recipe-index="${index}"
+                                    class="recipe-card p-3.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-500 dark:hover:border-blue-500 cursor-pointer transition-all shadow-xs"
+                                >
+                                    <h3 class="font-semibold text-base mb-1">${escapeHTML(recipe.title)}</h3>
+                                    ${recipe.metadata && Object.keys(recipe.metadata).length > 0 ? `
+                                        <div class="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
+                                            ${Object.entries(recipe.metadata).slice(0, 2).map(([k, v]) => `
+                                                <span><strong class="capitalize">${escapeHTML(k)}:</strong> ${escapeHTML(v)}</span>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            app.innerHTML = `
+                <div class="w-full max-w-2xl flex flex-col flex-1 bg-white dark:bg-gray-900 shadow-sm border-x border-gray-200 dark:border-gray-800">
+                    <header class="px-4 py-3 border-b border-gray-200 dark:border-gray-800 flex justify-between items-center bg-white dark:bg-gray-900 sticky top-0 z-10">
+                        <h1 class="text-base font-bold tracking-tight">Recipe Book</h1>
+                        <span class="text-xs font-mono text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
+                            v${VERSION}
+                        </span>
+                    </header>
+                    <main class="flex-1 flex flex-col overflow-y-auto">
+                        ${contentHTML}
+                    </main>
+                </div>
+            `;
+
+            attachEventListeners();
         }
 
-        const searchInput = document.getElementById('search');
-        searchInput.addEventListener('input', executeSearch);
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>'"]/g,
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
 
-        // Dismiss mobile keyboard on Enter key press
-        searchInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                searchInput.blur();
+        function attachEventListeners() {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.addEventListener('change', handleFileSelect);
             }
-        });
 
-        // Initialize theme on load
-        initTheme();
+            const backBtn = document.getElementById('back-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => {
+                    state.selectedRecipeIndex = null;
+                    render();
+                });
+            }
+
+            document.querySelectorAll('.recipe-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const index = parseInt(card.getAttribute('data-recipe-index'), 10);
+                    state.selectedRecipeIndex = index;
+                    render();
+                });
+            });
+
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    state.searchQuery = e.target.value;
+                    render();
+                    const newInput = document.getElementById('search-input');
+                    if (newInput) {
+                        newInput.focus();
+                        newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+                    }
+                });
+
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        searchInput.blur();
+                    }
+                });
+            }
+
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', () => {
+                    state.searchQuery = '';
+                    render();
+                });
+            }
+
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    state.searchMode = btn.getAttribute('data-mode');
+                    render();
+                });
+            });
+        }
+
         loadRecipes();
     </script>
 </body>
